@@ -1,0 +1,32 @@
+.dropzone-container {
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    margin: 20px 0;
+    color: #888;
+    transition: border-color 0.2s ease-in-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 230px; /* Give it some default height */
+    padding: 20px;
+}
+
+.dropzone-container.clickable {
+    cursor: pointer;
+}
+
+.dropzone-container.active {
+    border-color: var(--primary-color);
+}
+
+/* Make child elements "invisible" to pointer events so the parent div always catches the drag events. */
+.dropzone-container > * {
+    pointer-events: none;
+}
+
+.dropzone-preview {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}

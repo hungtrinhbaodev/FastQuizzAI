@@ -1,0 +1,50 @@
+:root {
+  --primary-color: #2c3e50;
+  --text-color: #bdc3c7;
+  --border-radius: 4px;
+  --dialog-text-color: #1e1546ee;
+  --dialog-content-font-size: 22px;
+  --accept-color: #19e723;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  box-sizing: border-box;
+  font-size: 16px;
+  min-height: 40px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: rgb(206, 198, 198);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.secondary-btn {
+  background-color: #6c757d; /* A neutral grey */
+}
+
+.base-label-header {
+  color: white
+}

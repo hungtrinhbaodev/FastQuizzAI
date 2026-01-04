@@ -1,0 +1,98 @@
+/* Base state (Hidden/Transparent) */
+.dialog-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Opening State */
+.dialog-backdrop.active {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+}
+
+.dialog-backdrop.active .dialog-content {
+  animation: slideIn 0.3s forwards;
+}
+
+.title {
+  color: var(--dialog-text-color);
+  font-size: 30px;
+  font-weight: bold;
+}
+
+/* Closing State */
+.dialog-backdrop.closing {
+  background-color: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+}
+
+.dialog-backdrop.closing .dialog-content {
+  animation: slideOut 0.3s forwards;
+}
+
+.dialog-content {
+  background: white;
+  max-width: 98%;
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-header {
+  padding: 10px 20px 5px 20px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+}
+
+.dialog-body {
+  padding: 10px 5px; /* More vertical space for the text */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Style your buttons to match your LawQuiz theme */
+.confirm-btn {
+  color: white;
+  padding: 10px 30px;
+  border-radius: 5px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-x {
+  object-fit: cover; 
+  width: 30px;
+  height: 30px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+close-x:hover {
+  opacity: 0.6;
+}
+
+/* Keyframes */
+@keyframes slideIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideOut {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(0.9); opacity: 0; }
+}

@@ -1,0 +1,29 @@
+.user-info-container {
+    display: flex;
+    flex-direction: row;
+    padding: 10px 10px 10px 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.user-info-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* This creates the circle */
+    object-fit: cover;   /* This prevents the image from looking squished */
+    margin-right: 10px;
+}
+
+.user-info-name {
+    color: #f1f1f1;
+    font-size: 18px;
+    font-weight: bold;
+    align-self: center;
+}
+
+@container (max-width: 150px) {
+    .user-info-container {
+        flex-direction: column;
+        align-items: center;
+    }
+}

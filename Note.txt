@@ -1,0 +1,2 @@
+CSS:
+ - {@keyword container-type}: We can turn on element into container by style container-type: {size | inline-size} and in child of that we can use @container to query it to make suitable responsive
