@@ -8,7 +8,6 @@ import appService from './services/AppService';
 import TableContent from './TableContent';
 import './CreateExamPage.css';
 
-import imageAddDocs from './assets/imageAddDocs.jpg';
 import DialogData from './data/DialogData';
 import DocumentData from './data/DocumentData';
 import AppUtils from './services/AppUtils';
