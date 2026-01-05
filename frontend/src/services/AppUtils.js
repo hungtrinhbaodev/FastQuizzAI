@@ -28,4 +28,19 @@ AppUtils.getDateFrom = function(timestamp) {
     return vnFull;
 }
 
+
+AppUtils.getDifficultNameBy = function(difficultType) {
+    switch (parseInt(difficultType)) {
+        case AppConst.EXAM_DIFFICULT.EASY: {
+            return "Easy";
+        }
+        case AppConst.EXAM_DIFFICULT.MEDIUM: {
+            return "Medium";
+        }
+        case AppConst.EXAM_DIFFICULT.HARD: {
+            return "Hard";
+        }
+    }
+}
+
 export default AppUtils;

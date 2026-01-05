@@ -26,6 +26,7 @@ frontend/*.local
 # backend
 backend/__pycache__
 backend/dist
+backend/assets/*
 
 backend/*/__pycache__
 backend/build

@@ -7,6 +7,7 @@ import './AddDocument.css';
 import appService from './services/AppService';
 import AppUtils from './services/AppUtils';
 import LoadingData from './data/LoadingData';
+import BoxOneOption from './BoxOneOption';
 
 
 const AddDocument = ({closeDialog, useLoading}) => {
@@ -109,7 +110,12 @@ const AddDocument = ({closeDialog, useLoading}) => {
                         onChange={(e) => setDocName(e.target.value)}
                     />
                 </div>
-                <div
+                <BoxOneOption 
+                    title={"Select document tag:"}
+                    optionNames={getAllDocumentTagName()}
+                    onChosenOptions={onChoseTag}
+                />
+                {/* <div
                     className='document-tag-container'
                 >
                     <label
@@ -133,7 +139,7 @@ const AddDocument = ({closeDialog, useLoading}) => {
                             </button>
                         ))}
                     </div>
-                </div>
+                </div> */}
                 <Dropzone
                     onDrop={handleDocumentDrop}
                     hasFile={file !== null}
