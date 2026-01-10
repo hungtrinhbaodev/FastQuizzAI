@@ -1,0 +1,68 @@
+.slider-point-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.slider-point-background-bar {
+    width: 95%;
+    height: 30px;
+    border: 2px solid #0000008e;
+    border-radius: 12px;
+    background-color: #99999930;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+}
+
+.slider-point-bar {
+    width: 0%;
+    background-color: var(--primary-color);
+    height: 98%;
+    border-radius: 11px;
+}
+
+.slider-point-button-slide {
+    display: block;
+    width: 30px;
+    height: 40px;
+    position: absolute;
+    background-color: #ccc;
+    border: 2px solid #0000009e;
+    border-radius: 8px;
+    z-index: 1000;
+    left: 100%;
+    touch-action: none;
+    cursor: pointer;
+}
+
+.slider-point-button-tooltip {
+    display: flex;
+    min-width: 100px;
+    height: 30px;
+    bottom: 150%;
+}
+
+.slider-point-label-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.slider-point-label-start {
+    margin-bottom: 0px;
+    justify-self: left;
+}
+
+.slider-point-label-end {
+    margin-bottom: 0px;
+    margin-left: auto;
+}
+
+.slider-point-label {
+    color: var(--dialog-text-color);
+}

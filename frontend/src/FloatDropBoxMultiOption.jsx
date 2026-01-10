@@ -1,83 +1,134 @@
-import {useState} from 'react'
+import {useState, useRef} from 'react'
+import './FloatDropBoxMultiOption.css'
+import AppUtils from './services/AppUtils';
+import {FaTimes} from 'react-icons/fa'
 
 const FloatDropBoxMultiOption = ({optionNames, onChoseOptions}) => {
 
-    const [chosenOptions, setChosenOptions] = useState([]);
+    const [chosenOptionNames, setChosenOptionNames] = useState([]);
     const [keySearch, setKeySearch] = useState("");
     const [searchResults, setSearchReults] = useState([]);
+    const [isSearching, setSearching] = useState(false);
+    const [chosenOptions, setChosenOptions] = useState([]);
+    const refInputSearch = useRef(null);
 
-    const addChosenOption = (name) => {
-        setChosenOptions([...chosenOptions, name]);
+    const addChosenOption = (index) => {
+        const indexInOptions = optionNames.indexOf(searchResults[index]);
+        setChosenOptions([...chosenOptions, indexInOptions]);
+        setChosenOptionNames([...chosenOptionNames, optionNames[indexInOptions]]);
         onChoseOptions(chosenOptions);
+        stopSearching();
     }
 
-    const removeChosenOption = (name) => {
-        const index = chosenOptions.indexOf(name);
-        if (index > -1) {
-            chosenOptions.splice(index, 1);
+    const removeChosenOption = (index) => {
+        const indexInOptions = optionNames.indexOf(chosenOptionNames[index]);
+        const indexInChosenOptions = chosenOptions.indexOf(indexInOptions);
+        if (indexInChosenOptions > -1) {
+            chosenOptions.splice(indexInChosenOptions, 1);
+            chosenOptionNames.splice(indexInChosenOptions, 1);
         }
         setChosenOptions([...chosenOptions]);
+        setChosenOptionNames([...chosenOptionNames]);
         onChoseOptions(chosenOptions);
     }
 
     const getRemainOptionNames = () => {
-        const remainOptionNames = [];
-        for (const name of optionNames) {
-            if (!chosenOptions.includes(name)) {
-                remainOptionNames.push(name);
+        const remainOptionNames = optionNames.map(name => name);
+        for (const name of chosenOptionNames) {
+            let index = remainOptionNames.indexOf(name);
+            if (index > -1) {
+                remainOptionNames.splice(index, 1);
             }
         }
         return remainOptionNames
     }
 
+    const stopSearching = () => {
+        setSearching(false);
+        refInputSearch.current.value = "";
+        setKeySearch("");
+    }
+
     const onSearching = (keySearch) => {
+
         setKeySearch(keySearch);
+
         const remainOptionNames = getRemainOptionNames();
         const optionsShow = [];
+        const normKeySearch = AppUtils.convertUTF8ToNormal(keySearch);
         for (const name of remainOptionNames) {
-            if (name.includes(keySearch)) {
+            const normName = AppUtils.convertUTF8ToNormal(name);
+            if (normName.toLowerCase().includes(normKeySearch.toLowerCase())) {
                 optionsShow.push(name);
             }
         }
         setSearchReults(optionsShow);
     }
 
-    const onShowAllRemainOptions = () => {
-        const remainOptionNames = getRemainOptionNames();
-        setSearchReults(remainOptionNames);
+    const onShowAllRemainOptions = (e) => {
+
+        setSearching(true);
+
+        const inputText = e.target.value;
+        if (inputText == "") {
+            const remainOptionNames = getRemainOptionNames();
+            setSearchReults(remainOptionNames);
+        }
     }
 
     return (
         <>
             <div
                 className='float-drop-box-input-chosen-suggest-container'
+                ref={refInputSearch}
             >
                 <input 
                     type='text'
                     className='float-drop-box-input-suggest'
-                    onClick={() => {onShowAllRemainOptions()}}
+                    onClick={(e) => {onShowAllRemainOptions(e)}}
                     onChange={(e) => onSearching(e.target.value)}
                     value={keySearch}
                     placeholder='Enter your document name...'
                 />
-            </div>
-            <div
-                className='float-drop-box-options-suggest-group-container'
-            >
-                {searchResults.map((name, index) => (
+                {isSearching && (<FaTimes 
+                    className='float-drop-box-button-close-search'
+                    onClick={() => stopSearching()}
+                />)}
+                {isSearching && (
                     <div
-                        key={index}
-                        className='float-drop-box-search-option'
-                        onClick={() => {addChosenOption(index)}}
+                        className='float-drop-box-options-suggest-group-container'
+                        style={{
+                            'align-items': searchResults.length <= 0 ? 'center' : 'none',
+                            'justify-content': searchResults.length <= 0 ? 'center' : 'none',
+                            'padding-bottom': searchResults.length <= 0 ? '0px' : '5px'
+                        }}
+                        onClick={() => {
+                            searchResults.length <= 0 && stopSearching();
+                        }}
                     >
-                        {name}
+                        {searchResults.map((name, index) => (
+                            <div
+                                key={index}
+                                className='float-drop-box-search-option'
+                                onClick={() => {addChosenOption(index)}}
+                            >
+                                {name}
+                            </div>
+                        ))}
+                        {searchResults.length <= 0 && (
+                            <label
+                                className='float-drop-box-label-none-result'
+                            >
+                                Not have result...
+                            </label>
+                        )}
                     </div>
-                ))};
+                )}
             </div>
             <div
                 className='float-drop-box-chosen-options-container'
             >
-                {chosenOptions.map((name, index) => (
+                {chosenOptionNames.map((name, index) => (
                     <div
                         key={index}
                         className='float-drop-box-chosen-option'

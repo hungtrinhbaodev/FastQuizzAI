@@ -18,6 +18,7 @@ import Loading from './Loading';
 import LoadingData from './data/LoadingData';
 import ViewDocument from './ViewDocument';
 import ConfirmNotify from './ConfirmNotify';
+import AddExam from './AddExam';
 
 function App() {
 
@@ -51,8 +52,7 @@ function App() {
         default: {
           if (AppConst.DEV_MODE) {
             // TODO: test here
-            // setDialogData(DialogData.makeAddDocument());
-            // setDialogData(DialogData.makeCreateAccount());
+            setDialogData(DialogData.makeAddExam());
           }
           onPageSelected("create_exam");
           break;
@@ -117,6 +117,17 @@ function App() {
           dialogData={dialogData}
           closeDialog={closeDialog}
         />
+      )}
+      {/* {dialogData.isUsageAt(AppConst.DIALOG_USAGE.TEST) && (
+        <SliderPoint
+          startPercent={0.2}
+          onPercentAt={() => {}}
+          textStart={"30 minute"}
+          textEnd={"120 minute"}
+        />
+      )} */}
+      {dialogData.isUsageAt(AppConst.DIALOG_USAGE.ADD_EXAM) && (
+        <AddExam/>
       )}
     </Dialog>
 

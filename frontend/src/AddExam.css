@@ -1,0 +1,48 @@
+.add-exam-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.add-exam-input-name-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border: var(--dialog-background-border);
+    border-radius: var(--dialog-background-border-radius);
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 5px;
+}
+
+.add-exam-chose-document-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+    width: 100%;
+    border: var(--dialog-background-border);
+    border-radius: var(--dialog-background-border-radius);
+    padding: 10px;
+    margin-bottom: 5px;
+}
+
+.add-exam-slide-container {
+    display: flex;
+    flex-direction: column;
+    border: var(--dialog-background-border);
+    border-radius: var(--dialog-background-border-radius);
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.add-exam-label {
+    color: var(--dialog-text-color);
+    font-size: var(--dialog-content-font-size);
+}
+
+.add-exam-chose-difficult-container {
+    display: flex;
+    width: 100%;
+}
+

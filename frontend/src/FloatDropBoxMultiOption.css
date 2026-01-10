@@ -1,0 +1,106 @@
+.float-drop-box-input-chosen-suggest-container {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.float-drop-box-options-suggest-group-container {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    top: 43px;
+    max-height: 250px;
+    overflow-y: scroll;
+    overscroll-behavior: contain;
+    scrollbar-color: #888888 #f1f1f1; /* thumb color | track color */
+    scrollbar-width: thin;
+    border-radius: 8px;
+    border: 2px solid #4f4f4f;
+    padding-left: 5px;
+    padding-right: 5px;
+    box-shadow: inset;
+    padding-bottom: 5px;
+    z-index: 1000;
+    animation: slideIn 0.2s forwards;
+    min-height: 40px;
+}
+
+.float-drop-box-label-none-result {
+    margin: 0px;
+    color: var(--primary-color);
+}
+
+.float-drop-box-button-close-search {
+    color: #4f4f4f90 !important;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    right: 2%;
+    top: 6px;
+    cursor: pointer;
+}
+
+.float-drop-box-search-option {
+    background-color: #4f4f4f10;
+    margin-top: 5px;
+    border-radius: 4px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    padding-left: 15px;
+    border: 1px solid #4f4f4f90;
+    font-weight: bold;
+    font-size: 18px;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+.float-drop-box-search-option:hover {
+    transform: scale(1.01);
+    background-color: #4f4f4f30;
+    border: 2px solid #4f4f4fee;
+}
+
+.float-drop-box-chosen-options-container {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 100%;
+    column-gap: 8px;
+    row-gap: 5px;
+    max-height: 120px;
+    min-height: 100px;
+    overflow-y: scroll;
+    overscroll-behavior: contain;
+    border: 1px solid #4f4f4f90;
+    padding: 10px;
+    border-radius: 8px;
+    animation: name duration timing-function delay iteration-count direction fill-mode;
+}
+
+.float-drop-box-chosen-option {
+    background-color: var(--primary-color);
+    opacity: 95%;
+    border-radius: 10px;
+    color: var(--text-color);
+    padding: 5px 10px 5px 10px;
+    font-weight: bold;
+    height: 35px;
+    align-content: center;
+    cursor: pointer;
+}
+
+.float-drop-box-chosen-option:hover {
+    opacity: 0.8;
+    transform: scale(1.02);
+}
+
+/* Keyframes */
+@keyframes slideIn {
+  from { transform: scale(0.9); opacity: 0; transform: translateY(-50);}
+  to { transform: scale(1, 1); opacity: 1; transform: translateY(0)}
+}

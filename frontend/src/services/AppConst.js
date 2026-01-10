@@ -43,6 +43,8 @@ const AppConst = {
 
     DIALOG_USAGE: {
 
+        TEST: -2,
+
         NONE: -1,
 
         CREATE_ACCOUNT: 0,
@@ -54,6 +56,8 @@ const AppConst = {
         VIEW_DOCUMENT: 3,
 
         CONFIRM_NOTIFY: 4,
+
+        ADD_EXAM: 5,
 
     },
 
@@ -109,6 +113,43 @@ const AppConst = {
         RELOAD_USER_DATA: 0,
 
         RELOAD_USER_DOCUMMENTS: 1
+
+    },
+
+    SLIDER_STATE: {
+
+        IDLE: 0,
+
+        SLIDING: 1,
+
+        MOVE_BACK: 2
+    },
+
+    EXAM_DIFFICULT: {
+
+        EASY: 0,
+
+        MEDIUM: 1,
+
+        HARD: 2
+    },
+
+    EXAM_TIME: {
+
+        START: (30 * 60 * 1000), // 30 minutes in milisecond
+
+        END: (120 * 60 * 1000), // 120 minutes in milisecond
+
+        STEP: (5 * 60 * 1000) // step per slide is 5 minutes
+    },
+
+    EXAM_NUMBER_QUESTION: {
+
+        START: 30,
+
+        END: 120,
+
+        STEP: 10,
 
     }
 

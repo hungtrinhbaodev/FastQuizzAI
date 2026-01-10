@@ -5,6 +5,8 @@
   --dialog-text-color: #1e1546ee;
   --dialog-content-font-size: 22px;
   --accept-color: #19e723;
+  --dialog-background-border: 1.5px dashed #00000050;
+  --dialog-background-border-radius: 8px;
 }
 
 label {

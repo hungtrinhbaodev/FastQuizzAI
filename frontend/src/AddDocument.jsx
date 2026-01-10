@@ -110,36 +110,12 @@ const AddDocument = ({closeDialog, useLoading}) => {
                         onChange={(e) => setDocName(e.target.value)}
                     />
                 </div>
-                <BoxOneOption 
+                <BoxOneOption
                     title={"Select document tag:"}
                     optionNames={getAllDocumentTagName()}
                     onChosenOptions={onChoseTag}
+                    defaultChosenIndex={getAllDocumentTag().indexOf(AppConst.DOCUMENT_TAG.OTHER)}
                 />
-                {/* <div
-                    className='document-tag-container'
-                >
-                    <label
-                        className='label-input-name label-content'
-                    >
-                        Select document tag: "{getCurrentTagName()}"
-                    </label>
-                    <div
-                        className='tag-buttons-group'
-                    >
-                        {getAllDocumentTagName().map((tagName, index) => (
-                            <button
-                                key={index}
-                                className='button-tag-name'
-                                style={{
-                                    ...getChoseTagStyles(index)
-                                }}
-                                onClick={() => onChoseTag(index)}
-                            >
-                                {tagName}
-                            </button>
-                        ))}
-                    </div>
-                </div> */}
                 <Dropzone
                     onDrop={handleDocumentDrop}
                     hasFile={file !== null}

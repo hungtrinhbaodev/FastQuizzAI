@@ -82,6 +82,16 @@ class DialogData {
         );
     }
 
+    static makeAddExam() {
+        return new DialogData(
+            AppConst.DIALOG_USAGE.ADD_EXAM,
+            "Add Exam",
+            true,
+            '680px',
+            '720px'
+        );
+    }
+
     /**
      * 
      * @param {DocumentData} docData 
@@ -112,6 +122,16 @@ class DialogData {
                 confirmMessage,
                 callbackConfirm
             }
+        );
+    }
+
+    static makeTest(width = '480px', height = '600px') {
+        return new DialogData(
+            AppConst.DIALOG_USAGE.TEST,
+            "Dialog test",
+            true,
+            width,
+            height
         );
     }
 

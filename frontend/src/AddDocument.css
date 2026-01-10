@@ -8,9 +8,10 @@
     border: 1px solid #00000040;
     border-radius: 8px;
     margin-bottom: 10px;
-    margin-left: 5px;
-    width: 99%;
+    width: 100%;
     padding-top: 5px;
+    border-radius: var(--dialog-background-border-radius);
+    border: var(--dialog-background-border);
 }
 
 .input-name {

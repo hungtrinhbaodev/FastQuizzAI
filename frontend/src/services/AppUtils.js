@@ -43,4 +43,23 @@ AppUtils.getDifficultNameBy = function(difficultType) {
     }
 }
 
+AppUtils.convertUTF8ToNormal = function(str) {
+    return str.normalize("NFD")           // Step 1
+            .replace(/[\u0300-\u036f]/g, "") // Step 2
+            .replace(/đ/g, "d")              // Step 3 (Special case)
+            .replace(/Đ/g, "D");
+}
+
+AppUtils.convertMiliInToMinutes = function(milisecond) {
+    return Math.floor(milisecond / 60 / 1000);
+}
+
+AppUtils.getValuenInRangeWith = function(min, max, percent, step) {
+    const currentValue = min + percent * (max - min);
+    let value = step * (Math.round(currentValue / step));
+    if (value < min) value = min;
+    if (value > max) value = max;
+    return value;
+}
+
 export default AppUtils;

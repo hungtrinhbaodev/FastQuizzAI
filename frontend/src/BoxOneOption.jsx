@@ -1,9 +1,9 @@
 import { useState } from "react";
 import './BoxOneOption.css';
 
-const BoxOneOption = ({title, optionNames, onChosenOptions}) => {
+const BoxOneOption = ({title, optionNames, onChosenOptions, defaultChosenIndex}) => {
 
-    const [chosenIndex, setChosenIndex] = useState(-1);
+    const [chosenIndex, setChosenIndex] = useState(defaultChosenIndex);
 
     const getChoseTagStyles = (index) => {
         let styles = {};

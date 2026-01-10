@@ -1,1 +1,1 @@
-{"_default": {"1": {"app_state": 1, "current_user": "3d4ef890-2f5a-4bbd-9d83-3d857ddaca50", "pk": "APP"}, "2": {"id": "3d4ef890-2f5a-4bbd-9d83-3d857ddaca50", "name": "hungtb", "avatar": "/api/assets/avatars/3d4ef890-2f5a-4bbd-9d83-3d857ddaca50.png", "pk": "USER"}}}
+{"_default": {"1": {"app_state": 1, "current_user": "066ed3d1-254a-4861-9f42-5c7a4d05d56c", "pk": "APP"}, "2": {"id": "066ed3d1-254a-4861-9f42-5c7a4d05d56c", "name": "hungtb", "avatar": "/api/assets/avatars/066ed3d1-254a-4861-9f42-5c7a4d05d56c.png", "pk": "USER"}}}
