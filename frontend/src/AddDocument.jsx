@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import Dropzone from './Dropzone';
 import AppConst from './services/AppConst';
 import imageUploadPDF from './assets/imageUploadPDF.png';
@@ -8,9 +8,9 @@ import appService from './services/AppService';
 import AppUtils from './services/AppUtils';
 import LoadingData from './data/LoadingData';
 import BoxOneOption from './BoxOneOption';
+import DialogData from './data/DialogData';
 
-
-const AddDocument = ({closeDialog, useLoading}) => {
+const AddDocument = ({useDialog, closeDialog, useLoading}) => {
     
     const [docName, setDocName] = useState("");
     const [docType, setDocType] = useState(AppConst.DOCUMENT_TAG.OTHER);
@@ -49,28 +49,11 @@ const AddDocument = ({closeDialog, useLoading}) => {
         setDocType(type);
     }
 
-    const getChoseTagStyles = (index) => {
-        const allTags = getAllDocumentTag();
-        const type = allTags[index];
-        let styles = {};
-        styles['border'] = type === docType ? '3px solid var(--accept-color)' : '0px';
-        type === docType && (styles['backgroundColor'] =  "rgba(25, 66, 100, 1)");
-        type === docType && (styles['color'] =  "white");
-        type === docType && (styles['transform'] = "scale(1.1)");
-        return styles;
-    }
-
-    const getCurrentTagName = () => {
-        const allTags = getAllDocumentTag();
-        const index = allTags.indexOf(docType);
-        return getAllDocumentTagName()[index] || AppUtils.getDocumentTagNameBy(AppConst.DOCUMENT_TAG.OTHER);
-    }
-
     const getAcceptDocumentFormat = () => {
         return ".pdf, .doc, .docx, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     }
 
-    const handleConfirm = async () => {
+    const handleConfirm = () => {
 
         if (docName == "") {
             alert("Please enter your document name!");
@@ -83,11 +66,18 @@ const AddDocument = ({closeDialog, useLoading}) => {
 
         const loadingData = useLoading(LoadingData.makeLoading("Wait to upload your doccument!"));
 
-        await appService.addDoc(docName, docType, file);
-
-        useLoading(LoadingData.makeNone(loadingData));
-
         closeDialog();
+
+        appService.addDoc(docName, docType, file, (docData) => {
+
+            useLoading(LoadingData.makeNone(loadingData));
+
+            useDialog(DialogData.makeConfirmNotify(
+                "Create document name: " + docData.name + " successfully!"
+            ));
+
+        });
+
     }
 
     return (

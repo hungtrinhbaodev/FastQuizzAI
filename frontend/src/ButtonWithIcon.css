@@ -1,0 +1,26 @@
+.button-with-icon-icon {
+    width: 30px;
+    height: 30px;
+    color: var(--text-color) !important;
+}
+
+.button-with-icon-label {
+    font-size: 15px;
+    color: var(--text-color);
+    cursor: pointer;
+    padding-top: 8px;
+}
+
+.button-with-icon-container {
+    display: inline-flex;
+    width: fit-content;
+    flex-direction: row;
+    background-color: var(--primary-color);
+    border: 2px solid #4f4f4f90;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    gap: 10px;
+    padding: 0px 10px 0px 10px;
+}

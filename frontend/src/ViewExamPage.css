@@ -1,0 +1,14 @@
+.view-exam-page-container {
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+    container-name: view-exam-container;
+}
+
+@container view-exam-container (max-width: 800px) {
+    .table-cell {
+        overflow: hidden;
+        text-overflow: ellipsis; /* Adds the "..." */
+        max-height: 50px;
+    }
+}

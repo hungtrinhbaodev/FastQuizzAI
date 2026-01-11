@@ -82,13 +82,14 @@ class DialogData {
         );
     }
 
-    static makeAddExam() {
+    static makeAddExam(defaultDocIds = []) {
         return new DialogData(
             AppConst.DIALOG_USAGE.ADD_EXAM,
             "Add Exam",
             true,
             '680px',
-            '720px'
+            '720px',
+            defaultDocIds
         );
     }
 

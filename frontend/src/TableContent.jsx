@@ -1,6 +1,7 @@
 import React from 'react';
 import AppConst from './services/AppConst';
 import './TableContent.css';
+import AppIcon from './AppIcon';
 import {FaFileMedicalAlt, FaTrashAlt, FaRegAddressBook} from 'react-icons/fa'
 
 const TableContent = ({tableData, onCellClick, children}) => {
@@ -88,6 +89,26 @@ const TableContent = ({tableData, onCellClick, children}) => {
                                                 {cellData}
                                             </div>)
                                         }
+                                        {
+                                            colIndex < tableData.numCols && tableData.dataTypes[colIndex] === AppConst.TABLE_CONTENT_TYPE.MULIT_TEXT && (
+                                            <div
+                                                className='table-data-multi-text table-cell'
+                                                 style={{
+                                                    ...getBackgroundStyles(colIndex),
+                                                    ...getBorderStyles(colIndex, rowIndex, tableData.numCols, tableData.numRows, tableData.minHeight),
+                                                    width: tableData.widths[colIndex] 
+                                                }}
+                                            >
+                                                {cellData.map((data, index) => (
+                                                    <div
+                                                        className='table-data-text-in-multi-text'
+                                                        key={index}
+                                                    >
+                                                        {data}
+                                                    </div>
+                                                ))}
+                                            </div>)
+                                        }
                                         {colIndex < tableData.numCols && tableData.dataTypes[colIndex] === AppConst.TABLE_CONTENT_TYPE.ICON && (
                                             <div 
                                                 className='table-data-icon table-cell'
@@ -98,21 +119,10 @@ const TableContent = ({tableData, onCellClick, children}) => {
                                                 }}
                                                 onClick={() => {onCellClick && onCellClick(rowIndex, colIndex)}}
                                             >
-                                                {cellData === AppConst.TABLE_ICON_TYPE.WATCH && (
-                                                    <FaFileMedicalAlt
-                                                        className='table-icon'
-                                                    />
-                                                )}
-                                                {cellData === AppConst.TABLE_ICON_TYPE.DELETE && (
-                                                    <FaTrashAlt
-                                                        className='table-icon'
-                                                    />
-                                                )}
-                                                {cellData === AppConst.TABLE_ICON_TYPE.MAKE_EXAM && (
-                                                    <FaRegAddressBook
-                                                        className='table-icon'
-                                                    />
-                                                )}
+                                                <AppIcon 
+                                                    className='table-content-icon-data'
+                                                    iconType={cellData}
+                                                />
                                             </div>)
                                         }
                                     </React.Fragment>

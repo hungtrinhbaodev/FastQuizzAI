@@ -33,6 +33,8 @@
 .float-drop-box-label-none-result {
     margin: 0px;
     color: var(--primary-color);
+    font-size: 18px;
+    cursor: pointer;
 }
 
 .float-drop-box-button-close-search {

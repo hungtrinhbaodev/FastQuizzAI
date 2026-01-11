@@ -1,53 +1,45 @@
-import {useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import FloatDropBoxMultiOption from './FloatDropBoxMultiOption';
 import AppConst from './services/AppConst';
 import AppUtils from './services/AppUtils';
 import appService from './services/AppService';
-import BoxOneOption from './BoxOneOption';
 import SliderPoint from './SliderPoint';
+import LoadingData from './data/LoadingData';
+import DialogData from './data/DialogData';
 import './AddExam.css';
 
-const AddExam = ({}) => {
+const AddExam = ({defaultDocIds, useDialog, closeDialog, useLoading}) => {
     
     const [examName, setExamName] = useState("");
-    const [examDocsId, setExamDocsId] = useState([]);
-    const [examTime, setExamTime] = useState(0);
+    const [examDocIndices, setExamDocIndices] = useState([]);
+    const [examTime, setExamTime] = useState(AppConst.EXAM_TIME.START);
     const [examTimeText, setExamTimeText] = useState(AppUtils.convertMiliInToMinutes(AppConst.EXAM_TIME.START) + " minutes")
     const [examNumberQuestion, setExamNumberQuestion] = useState(AppConst.EXAM_NUMBER_QUESTION.START);
-    // const [examDifficult, setExamDifficult] = useState(0);
     const [docsData, setDocsData] = useState([]);
 
-    (async() => {
-        const docData = await appService.requestUserDocs();
-        setDocsData(docData);
-    })();
+    useEffect(() => {
 
-    // const getListDifficultTypes  = () => {
-    //     let listDifficult = [];
-    //     for (const key in AppConst.EXAM_DIFFICULT) {
-    //         listDifficult.push(AppConst.EXAM_DIFFICULT[key]);
-    //     }
-    //     return listDifficult;
-    // }
+        (async() => {
+            const docsData = await appService.requestUserDocs();
+            setDocsData(docsData);
 
-    // const getListDifficultNames = () => {
-    //     let listDifficultNames = [];
-    //     for (const difficultType of getListDifficultTypes()) {
-    //         listDifficultNames.push(AppUtils.getDifficultNameBy(difficultType));
-    //     }
-    //     console.log("listDifficultNames", listDifficultNames);
-    //     return listDifficultNames;
-    // }
+            const defaultDocIndices = [];
+            for (const docId of defaultDocIds) {
+                for (let i = 0; i < docsData.length;i++) {
+                    if (docsData[i].id === docId) {
+                        defaultDocIndices.push(i);
+                    }
+                }
+            }
+            setExamDocIndices(defaultDocIndices);
 
-    // const onChoseDifficult = (index) => {
-    //     setExamDifficult(getListDifficultTypes()[index]);
-    // }
+        })();
 
-    const onChoseDocs = (docIndices) => {
-        const docIds = [];
-        docIndices.map(index => docsData[index].id);
-        setExamDocsId(docIds);
-    }
+    }, [defaultDocIds]);
+
+    const onChoseDocs = useCallback((docIndices) => {
+        setExamDocIndices(docIndices);
+    });
 
     const onChoseTimeExam = (percent) => {
         let timeRoundByStep = AppUtils.getValuenInRangeWith(
@@ -68,6 +60,48 @@ const AddExam = ({}) => {
             AppConst.EXAM_NUMBER_QUESTION.STEP
         );
         setExamNumberQuestion(numberQuestion);
+    }
+
+    const handleConfirm = () => {
+
+        if (examName == "") {
+            alert("Please enter your exam name!");
+            return;
+        }
+        if (examDocIndices.length <= 0) {
+            alert("Please chose documents!");
+            return;
+        }
+        if (examTime <= 0) {
+            alert("Please chose time exam!");
+            return;
+        }
+        if (examNumberQuestion <= 0) {
+            alert("Please chose number question!");
+            return;
+        }
+
+        const examDocsId = examDocIndices.map(index => docsData[index].id);
+
+        const loadingData = useLoading(LoadingData.makeLoading("Wait to create your exam!"));
+
+        closeDialog();
+
+        appService.addExam(
+            examName, 
+            examDocsId, 
+            examNumberQuestion,
+            examTime, 
+            () => {
+
+                useLoading(LoadingData.makeNone(loadingData));
+
+                useDialog(DialogData.makeConfirmNotify(
+                    "Create exam name: " + examName + " successfully!"
+                ));
+            }
+        );
+
     }
 
     return (
@@ -104,6 +138,7 @@ const AddExam = ({}) => {
                     <FloatDropBoxMultiOption
                         optionNames={docsData.map(docData => docData.name)}
                         onChoseOptions={onChoseDocs}
+                        defaultChosenOptions={examDocIndices}
                     />
                 </div>
             </div>
@@ -135,21 +170,21 @@ const AddExam = ({}) => {
                 <SliderPoint
                     onPercentAt={onChoseNumberQuestion}
                     startPercent={0}
-                    textStart={"30 question"}
-                    textEnd={"120 question"}
+                    textStart={"30 questions"}
+                    textEnd={"120 questions"}
                 />
             </div>
 
-            {/* <div
-                className='add-exam-chose-difficult-container'
+            <div
+                className='add-exam-button-group-container'
             >
-                <BoxOneOption 
-                    title={"Chose difficult exam:"}
-                    optionNames={getListDifficultNames()}
-                    onChosenOptions={onChoseDifficult}
-                    defaultChosenIndex={getListDifficultTypes().indexOf(AppConst.EXAM_DIFFICULT.EASY)}
-                />
-            </div> */}
+                <button
+                    className='add-exam-button-confirm'
+                    onClick={() => {handleConfirm()}}
+                >
+                    Confirm
+                </button>
+            </div>
 
         </div>
     );

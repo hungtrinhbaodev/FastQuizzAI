@@ -2,6 +2,8 @@ import AppData from "../data/AppData";
 import DocumentData from "../data/DocumentData";
 import UserData from "../data/UserData";
 import AppConst from "./AppConst";
+import ExamData from "../data/ExamData";
+import App from "../App";
 
 
 class AppService {
@@ -10,6 +12,7 @@ class AppService {
         this._userData = new UserData();
         this._appData = new AppData();
         this._docsData = null;
+        this._examsData = null;
         this._listeners = [];
     }
 
@@ -31,6 +34,10 @@ class AppService {
         return this._docsData;
     }
 
+    getUserExams() {
+        return this._examsData;
+    }
+
     subscribe(listener) {
         this._listeners.push(listener);
     }
@@ -45,6 +52,14 @@ class AppService {
 
     hasUser() {
         return this._appData.getAppState() !== AppConst.APP_STATE.NO_LOGIN && this._userData.getUserName() !== "";
+    }
+
+    getDocBy(docId) {
+        return this._docsData.find(doc => doc.id === docId);
+    }
+
+    getExanBy(examId) {
+        return this._examsData.find(exam => exam.id === examId);
     }
 
     /**
@@ -166,6 +181,15 @@ class AppService {
         }
     }
 
+    putDocData(docName, docTag, docFile) {
+        const formData = new FormData();
+        formData.append('user_id', this._userData.getUserId());
+        formData.append('doc_name', docName);
+        formData.append('doc_tag', docTag);
+        formData.append('document', docFile);
+        return formData;
+    }
+
     readDocDataFrom(dataResult) {
         return new DocumentData(
             dataResult['id'],
@@ -176,12 +200,28 @@ class AppService {
         );
     }
 
-    async addDoc(docName, docTag, docFile) {
+    putExamData(examName, examDocIdsContent, examNumberQuestion, examDuration) {
         const formData = new FormData();
         formData.append('user_id', this._userData.getUserId());
-        formData.append('doc_name', docName);
-        formData.append('doc_tag', docTag);
-        formData.append('document', docFile);
+        formData.append('exam_name', examName);
+        formData.append('document_ids', JSON.stringify(examDocIdsContent));
+        formData.append('number_question', examNumberQuestion);
+        formData.append('exam_duration', examDuration);
+        return formData;
+    }
+
+    readExamDataFrom(dataResult) {
+        return new ExamData(
+            dataResult['id'],
+            dataResult['name'],
+            dataResult['number_question'],
+            dataResult['exam_duration'],
+            dataResult['document_ids']
+        );
+    }
+
+    async addDoc(docName, docTag, docFile, execute = () => {}) {
+        const formData = this.putDocData(docName, docTag, docFile);
 
         try {
             const result = await this._send(
@@ -201,14 +241,18 @@ class AppService {
 
             this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DOCUMMENTS);
 
+            if (typeof execute == "function") {
+                execute(docData);
+            }
+
         } catch(error) {
             console.error("Add document fail", error);
         }
 
     }
 
-    async requestUserDocs() {
-        if (this._docsData === null) {
+    async requestUserDocs(isForce = false) {
+        if (this._docsData === null || isForce) {
 
             const formData = new FormData();
             formData.append('user_id', this._userData.getUserId());
@@ -262,6 +306,109 @@ class AppService {
             console.error("Remove doc fail", e);
         }
     } 
+
+    async requestExams(isForce = false) {
+
+        if (this._examsData === null || isForce) {
+
+            const formData = new FormData();
+            formData.append('user_id', this._userData.getUserId());
+            
+            try {
+
+                const result = await this._send(
+                    AppConst.ROUTER.GET_EXAMS,
+                    AppConst.TYPE_SEND.POST,
+                    formData     
+                );
+
+                const exams = result['exams_data'];
+                console.log("Get exams", exams);
+                this._examsData = [];
+
+                for (const exam of exams) {
+                    this._examsData.push(this.readExamDataFrom(exam));
+                }
+
+                return this._examsData;
+
+            } catch (e) {
+                console.error("Get user exams fail", e);
+            }
+
+        }
+
+        return this._examsData;
+    }
+
+    async addExam(
+        examName,
+        examDocIdsContent,
+        examNumberQuestion,
+        examDuration,
+        execute = () => {}
+    ) {
+        const formData = this.putExamData(examName, examDocIdsContent, examNumberQuestion, examDuration);
+        try {
+
+            const result = await this._send(
+                AppConst.ROUTER.CREATE_EXAM,
+                AppConst.TYPE_SEND.POST,
+                formData
+            );
+
+            const exam = result['exam_data'];
+
+            const examData = this.readExamDataFrom(exam);
+
+            if (!this._examsData) {
+                this._examsData = await this.requestExams();
+            }
+            else {
+                this._examsData.push(examData);
+            }
+            
+            this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAMS);
+
+            if (typeof execute == 'function') {
+                execute(exam);
+            }
+            
+        } catch (e) {
+            console.error("Add exam fail", e);
+        }
+    }
+    
+    async removeExam(examId, execute = () => {}) {
+        const examData = this.getExanBy(examId);
+        if (examData) {
+
+            const formData = new FormData();
+            formData.append('user_id', this._userData.getUserId());
+            formData.append('exam_id', examId);
+
+            try {
+
+                const result = await this._send(
+                    AppConst.ROUTER.REMOVE_EXAM,
+                    AppConst.TYPE_SEND.POST,
+                    formData
+                );
+
+                this._examsData = this._examsData.filter(exam => exam.id !== examId);
+
+                this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAMS);
+
+                if (typeof execute == 'function') {
+                    execute(result);
+                }
+
+            } catch (e) {
+                console.error("Remove exam fail", e);
+            }
+
+        }
+    }
 }
 
 const appService = new AppService();

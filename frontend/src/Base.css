@@ -50,3 +50,19 @@ button:hover {
 .base-label-header {
   color: white
 }
+
+.base-page-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 10px;
+  gap: 20px;
+  animation: pageShowIn 0.25s ease-out;
+  background-color: #00000000;
+}
+
+/* Keyframes */
+@keyframes pageShowIn {
+  from { transform: scale(0.99); opacity: 0; translate: 20px 0px;}
+  to { transform: scale(1); opacity: 1; translate: 0px 0px;}
+}

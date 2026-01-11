@@ -19,6 +19,7 @@ import LoadingData from './data/LoadingData';
 import ViewDocument from './ViewDocument';
 import ConfirmNotify from './ConfirmNotify';
 import AddExam from './AddExam';
+import ViewExamPage from './ViewExamPage';
 
 function App() {
 
@@ -32,11 +33,13 @@ function App() {
   }
 
   const useDialog = (dialogData) => {
+      console.log("useDialog dialogData", dialogData);
       setDialogData(dialogData);
       return dialogData;
   };
 
   const closeDialog = () => {
+    console.log("closeDialog dialogData", dialogData);
     setDialogData(DialogData.makeNone(dialogData));
   }
 
@@ -52,7 +55,7 @@ function App() {
         default: {
           if (AppConst.DEV_MODE) {
             // TODO: test here
-            setDialogData(DialogData.makeAddExam());
+            // setDialogData(DialogData.makeAddExam());
           }
           onPageSelected("create_exam");
           break;
@@ -97,6 +100,7 @@ function App() {
       )}
       {dialogData.isUsageAt(AppConst.DIALOG_USAGE.ADD_DOCUMENT) && (
         <AddDocument
+          useDialog={useDialog}
           closeDialog={closeDialog}
           useLoading={useLoading}
         />
@@ -118,16 +122,15 @@ function App() {
           closeDialog={closeDialog}
         />
       )}
-      {/* {dialogData.isUsageAt(AppConst.DIALOG_USAGE.TEST) && (
-        <SliderPoint
-          startPercent={0.2}
-          onPercentAt={() => {}}
-          textStart={"30 minute"}
-          textEnd={"120 minute"}
+      {dialogData.isUsageAt(AppConst.DIALOG_USAGE.ADD_EXAM) 
+      && dialogData.extraData !== null
+      && (
+        <AddExam
+          defaultDocIds={dialogData.extraData}
+          useLoading={useLoading}
+          useDialog={useDialog}
+          closeDialog={closeDialog}
         />
-      )} */}
-      {dialogData.isUsageAt(AppConst.DIALOG_USAGE.ADD_EXAM) && (
-        <AddExam/>
       )}
     </Dialog>
 
@@ -143,6 +146,15 @@ function App() {
         (<CreateExamPage
           useLoading={useLoading}
           useDialog={useDialog}
+        />)
+      }
+      {appService.getAppData().getAppState() === AppConst.APP_STATE.IDLE
+      &&  page === "view_exam"
+      &&
+        (<ViewExamPage
+          useDialog={useDialog}
+          useLoading={useLoading}
+          changePage={onPageSelected}
         />)
       }
     </div>

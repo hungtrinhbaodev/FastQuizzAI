@@ -1,9 +1,9 @@
-import {useState, useRef} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import './FloatDropBoxMultiOption.css'
 import AppUtils from './services/AppUtils';
 import {FaTimes} from 'react-icons/fa'
 
-const FloatDropBoxMultiOption = ({optionNames, onChoseOptions}) => {
+const FloatDropBoxMultiOption = ({optionNames, onChoseOptions, defaultChosenOptions}) => {
 
     const [chosenOptionNames, setChosenOptionNames] = useState([]);
     const [keySearch, setKeySearch] = useState("");
@@ -12,11 +12,18 @@ const FloatDropBoxMultiOption = ({optionNames, onChoseOptions}) => {
     const [chosenOptions, setChosenOptions] = useState([]);
     const refInputSearch = useRef(null);
 
+    useEffect(() => {
+        defaultChosenOptions = defaultChosenOptions.filter(option => (option >= 0 && option < optionNames.length));
+        setChosenOptions(defaultChosenOptions);
+        setChosenOptionNames(defaultChosenOptions.map(index => optionNames[index]));
+    }, [defaultChosenOptions, optionNames]);
+
     const addChosenOption = (index) => {
         const indexInOptions = optionNames.indexOf(searchResults[index]);
-        setChosenOptions([...chosenOptions, indexInOptions]);
+        const choseOptions = [...chosenOptions, indexInOptions];
+        setChosenOptions(choseOptions);
         setChosenOptionNames([...chosenOptionNames, optionNames[indexInOptions]]);
-        onChoseOptions(chosenOptions);
+        onChoseOptions(choseOptions);
         stopSearching();
     }
 
@@ -29,7 +36,7 @@ const FloatDropBoxMultiOption = ({optionNames, onChoseOptions}) => {
         }
         setChosenOptions([...chosenOptions]);
         setChosenOptionNames([...chosenOptionNames]);
-        onChoseOptions(chosenOptions);
+        onChoseOptions([...chosenOptions]);
     }
 
     const getRemainOptionNames = () => {
@@ -98,9 +105,9 @@ const FloatDropBoxMultiOption = ({optionNames, onChoseOptions}) => {
                     <div
                         className='float-drop-box-options-suggest-group-container'
                         style={{
-                            'align-items': searchResults.length <= 0 ? 'center' : 'none',
-                            'justify-content': searchResults.length <= 0 ? 'center' : 'none',
-                            'padding-bottom': searchResults.length <= 0 ? '0px' : '5px'
+                            'alignItems': searchResults.length <= 0 ? 'center' : 'none',
+                            'justifyContent': searchResults.length <= 0 ? 'center' : 'none',
+                            'paddingBottom': searchResults.length <= 0 ? '0px' : '5px'
                         }}
                         onClick={() => {
                             searchResults.length <= 0 && stopSearching();

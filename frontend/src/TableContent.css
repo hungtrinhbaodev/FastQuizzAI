@@ -47,3 +47,17 @@
     padding-left: 15px;
     min-height: 34px;
 }
+
+.table-data-multi-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+    gap: 1px;
+    padding-top: 2px;
+}
+
+.table-content-icon-data {
+    width: 20px;
+    height: 20px;
+}

@@ -27,7 +27,13 @@ const AppConst = {
 
         ADD_DOCUMENT: "/add-document-api",
 
-        REMOVE_DOCUMENT: "/remove-document-api"
+        REMOVE_DOCUMENT: "/remove-document-api",
+
+        GET_EXAMS: "/get-exams-api",
+
+        CREATE_EXAM: "/create-exam-api",
+
+        REMOVE_EXAM: "/remove-exam-api",
 
     },
 
@@ -48,8 +54,6 @@ const AppConst = {
         NONE: -1,
 
         CREATE_ACCOUNT: 0,
-
-        CREATE_EXAM: 1,
 
         ADD_DOCUMENT: 2,
 
@@ -81,11 +85,13 @@ const AppConst = {
 
         TEXT: 0,
 
-        ICON: 1
+        ICON: 1,
+
+        MULIT_TEXT: 2
 
     },
 
-    TABLE_ICON_TYPE: {
+    ICON_TYPE: {
         
         WATCH: 0,
 
@@ -93,7 +99,9 @@ const AppConst = {
 
         ADD: 2,
 
-        DELETE: 3
+        DELETE: 3,
+
+        ADD_FOLDER: 4,
 
     },
 
@@ -112,7 +120,9 @@ const AppConst = {
         
         RELOAD_USER_DATA: 0,
 
-        RELOAD_USER_DOCUMMENTS: 1
+        RELOAD_USER_DOCUMMENTS: 1,
+
+        RELOAD_USER_EXAMS: 2
 
     },
 
@@ -151,7 +161,11 @@ const AppConst = {
 
         STEP: 10,
 
-    }
+    },
+
+    MAX_DOC_IN_EXAM: 5,
+
+    MAX_DOC_SHOW_IN_EXAM: 3,
 
 }
 

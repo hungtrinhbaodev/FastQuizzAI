@@ -20,6 +20,9 @@ class TableData {
 
         // min height for table that dose not have any content
         this.minHeight = 0;
+
+        // src that make this table data can get to use when need
+        this.srcData = null;
     }
 
 }

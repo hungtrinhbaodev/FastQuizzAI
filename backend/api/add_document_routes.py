@@ -3,11 +3,10 @@ import uuid
 from app import App
 from flask import Blueprint, jsonify, request, send_from_directory
 from data.document_data import Document_Data
-import time
+from const import DOCUMENTS_FOLDER
+import utils
 
 add_document_bp = Blueprint('add_docuement_api', __name__)
-
-DOCUMENTS_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets', 'documents')
 
 # --- API Endpoints ---
 @add_document_bp.route('/add-document-api', methods=['POST'])
@@ -33,7 +32,7 @@ def add_document():
     document_filename = f"{doc_id}{f_ext or '.pdf'}"
     document_file.save(os.path.join(DOCUMENTS_FOLDER, document_filename))
     document_url = f"/api/assets/documents/{document_filename}"
-    created_time = time.time_ns() // 1_000_000
+    created_time = utils.get_currrent_millisecond()
 
     document = Document_Data(
         name=request.form['doc_name'],

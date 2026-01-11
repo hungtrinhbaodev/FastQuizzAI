@@ -15,5 +15,11 @@ class Base_Data:
         db_object[pk_field] = pk_value
         return db_object
     
-    def get_dict(self):
-        return self.__dict__.copy()
+    def get_dict(self, igore_keys = []):
+        dict_data = self.__dict__.copy()
+        for key in igore_keys:
+            if key in dict_data:
+                del dict_data[key]
+        return dict_data
+    
+

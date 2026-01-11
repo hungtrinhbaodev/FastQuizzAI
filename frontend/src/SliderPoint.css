@@ -65,4 +65,6 @@
 
 .slider-point-label {
     color: var(--dialog-text-color);
+    pointer-events: none;
+    touch-action: none;
 }

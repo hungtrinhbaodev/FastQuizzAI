@@ -12,24 +12,26 @@ import DialogData from './data/DialogData';
 import DocumentData from './data/DocumentData';
 import AppUtils from './services/AppUtils';
 import LoadingData from './data/LoadingData';
+import EmptyTableData from './EmptyTableData';
+import ButtonWithIcon from './ButtonWithIcon';
 
 const CreateExamPage = ({useLoading, useDialog}) => {
 
     const [tableData, setTableData] = useState(null);
 
     const onCellClick = useCallback((rowIndex, colIndex) => {
+
         // Column 4 is View Document
-        if (colIndex === 4) {
+        if (colIndex === 3) {
             const docs = appService.getUserDocs();
             if (rowIndex >= 0 && rowIndex < docs.length) {
                 const doc = docs[rowIndex];
-                let dialogData = DialogData.makeViewDocument(doc);
-                useDialog(dialogData);
+                useDialog(DialogData.makeViewDocument(doc));
             }
         }
 
         // Column 6 is Delete Document
-        if (colIndex === 6) {
+        if (colIndex === 5) {
             const docs = appService.getUserDocs();
             if (rowIndex >= 0 && rowIndex < docs.length) {
                 const doc = docs[rowIndex];
@@ -43,6 +45,15 @@ const CreateExamPage = ({useLoading, useDialog}) => {
                         );
                     }
                 ));
+            }
+        }
+
+        // Column 5 is Make exam from document
+        if (colIndex === 4) {
+            const docs = appService.getUserDocs();
+            const docData = docs[rowIndex];
+            if (docData) {
+                useDialog(DialogData.makeAddExam([docData.id]));
             }
         }
 
@@ -60,10 +71,9 @@ const CreateExamPage = ({useLoading, useDialog}) => {
     const createTableDataFrom = (listDocData) => {
         let tableData = new TableData();
 
-        tableData.numCols = 7; // 4 field show of doc and 2 process (delete, view) doc
+        tableData.numCols = 6; // 4 field show of doc and 2 process (delete, view) doc
         tableData.numRows = listDocData.length;
         tableData.headers = [
-            "Document Id",
             "Document Name",
             "Created Time",
             "Document Tag",
@@ -72,16 +82,14 @@ const CreateExamPage = ({useLoading, useDialog}) => {
             "Delete Document"
         ];
         tableData.widths = [
-            "15%",
+            "30%",
             "20%",
-            "20%",
             "15%",
-            "10%",
+            "15%",
             "10%",
             "10%"
         ];
         tableData.dataTypes = [
-            AppConst.TABLE_CONTENT_TYPE.TEXT,
             AppConst.TABLE_CONTENT_TYPE.TEXT,
             AppConst.TABLE_CONTENT_TYPE.TEXT,
             AppConst.TABLE_CONTENT_TYPE.TEXT,
@@ -94,13 +102,12 @@ const CreateExamPage = ({useLoading, useDialog}) => {
         for (const docData of listDocData) {
             tableData.rowsData.push(
                 [
-                    docData.id,
                     docData.name,
                     AppUtils.getDateFrom(docData.createTime),
                     AppUtils.getDocumentTagNameBy(docData.tag),
-                    AppConst.TABLE_ICON_TYPE.WATCH,
-                    AppConst.TABLE_ICON_TYPE.MAKE_EXAM,
-                    AppConst.TABLE_ICON_TYPE.DELETE
+                    AppConst.ICON_TYPE.WATCH,
+                    AppConst.ICON_TYPE.MAKE_EXAM,
+                    AppConst.ICON_TYPE.DELETE
                 ]
             );
         }
@@ -151,7 +158,7 @@ const CreateExamPage = ({useLoading, useDialog}) => {
 
     return (
         <>
-            <div className='create-exam-container'>
+            <div className='create-exam-container base-page-container'>
                 <div
                     className="create-exam-header"
                 >
@@ -168,36 +175,19 @@ const CreateExamPage = ({useLoading, useDialog}) => {
                             tableData={tableData}
                             onCellClick={onCellClick}   
                         >
-                            <div 
-                                className='empty-docs'
-                            >
-                                <FaFolderPlus
-                                    className='button-add-docs'
-                                    onClick={() => {onAddDocs()}}
-                                />
-                                <label
-                                    className='label-add-docs'
-                                >
-                                    You don't have any documents. please, add once!
-                                </label>
-                            </div>
+                            <EmptyTableData
+                                text={"You don't have any documents. please, add once!"}
+                                onClick={() => {onAddDocs()}}
+                            />
                         </TableContent>
                     </div>
                 )}
                 {tableData && tableData.numRows > 0 && (
-                    <div
-                        className='create-exam-add-document-container'
-                        onClick={() => {onAddDocs()}}
-                    >
-                        <FaFolderPlus 
-                            className='button-add-docs-small'
-                        />
-                        <label
-                            className='label-add-docs-small'
-                        >
-                            Add more document
-                        </label>
-                    </div>
+                    <ButtonWithIcon
+                        iconType={AppConst.ICON_TYPE.ADD_FOLDER}
+                        text={"Add documents"}
+                        onClick={onAddDocs}
+                    />
                 )}
             </div>
         </>
