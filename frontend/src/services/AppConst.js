@@ -163,6 +163,11 @@ const AppConst = {
 
     },
 
+    EXAM_DETAIL_MODE: {
+        FULL: 0,
+        DOING: 1
+    },
+
     MAX_DOC_IN_EXAM: 5,
 
     MAX_DOC_SHOW_IN_EXAM: 3,

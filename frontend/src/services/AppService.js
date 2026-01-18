@@ -4,6 +4,9 @@ import UserData from "../data/UserData";
 import AppConst from "./AppConst";
 import ExamData from "../data/ExamData";
 import App from "../App";
+import ExamDetailData from "../data/ExamDetailData";
+import ExamQuestionData from "../data/ExamQuestionData";
+import ExamingData from "../data/ExamingData";
 
 
 class AppService {
@@ -13,6 +16,7 @@ class AppService {
         this._appData = new AppData();
         this._docsData = null;
         this._examsData = null;
+        this._examingData = null;
         this._listeners = [];
     }
 
@@ -60,6 +64,82 @@ class AppService {
 
     getExanBy(examId) {
         return this._examsData.find(exam => exam.id === examId);
+    }
+
+    getExamingData() {
+        return this._examingData;
+    }
+
+    putDocData(docName, docTag, docFile) {
+        const formData = new FormData();
+        formData.append('user_id', this._userData.getUserId());
+        formData.append('doc_name', docName);
+        formData.append('doc_tag', docTag);
+        formData.append('document', docFile);
+        return formData;
+    }
+
+    readDocDataFrom(dataResult) {
+        return new DocumentData(
+            dataResult['id'],
+            dataResult['name'],
+            dataResult['created_time'],
+            dataResult['url'],
+            dataResult['tag']
+        );
+    }
+
+    putExamData(examName, examDocIdsContent, examNumberQuestion, examDuration) {
+        const formData = new FormData();
+        formData.append('user_id', this._userData.getUserId());
+        formData.append('exam_name', examName);
+        formData.append('document_ids', JSON.stringify(examDocIdsContent));
+        formData.append('number_question', examNumberQuestion);
+        formData.append('exam_duration', examDuration);
+        return formData;
+    }
+
+    readExamDataFrom(dataResult) {
+        return new ExamData(
+            dataResult['id'],
+            dataResult['name'],
+            dataResult['number_question'],
+            dataResult['exam_duration'],
+            dataResult['document_ids']
+        );
+    }
+
+    readDetailData(examDetailData) {
+        const detailViewMode = examDetailData['detail_mode'];
+        const examDetailData = new ExamDetailData(detailViewMode);
+        const questions = examDetailData['questions'];
+        for (const question of questions) {
+            const questionData = new ExamQuestionData();
+            questionData.questionText = question['question_text'];
+            questionData.options = question['options'];
+            switch (detailViewMode) {
+                case AppConst.EXAM_DETAIL_MODE.FULL: {
+                    questionData.correctAnswer = question['correct_answer'];
+                    questionData.docId = question['doc_id'];
+                    questionData.explain = question['explanation_vi'];
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+            examDetailData.addQuestionData(questionData);
+        }
+        return examDetailData;
+    }
+
+    readExamingDataFrom(examingData, examDetailData) {
+        return new ExamingData(
+            examingData['exam_id'],
+            examingData['remaining_time'],
+            examingData['anwsers'],
+            this.readDetailData(examDetailData)
+        );
     }
 
     /**
@@ -145,6 +225,19 @@ class AppService {
             }
         }
 
+        switch (this._appData.getAppState()) {
+            case AppConst.APP_STATE.EXEMING: {
+                this._examingData = this.readExamingDataFrom(
+                    result['examing_data'],
+                    result['exam_detail']
+                );
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
         this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DATA);
 
         // Call excute login callback in App
@@ -179,45 +272,6 @@ class AppService {
             console.error("Account creation failed:", error);
             // TODO: Show an error dialog to the user
         }
-    }
-
-    putDocData(docName, docTag, docFile) {
-        const formData = new FormData();
-        formData.append('user_id', this._userData.getUserId());
-        formData.append('doc_name', docName);
-        formData.append('doc_tag', docTag);
-        formData.append('document', docFile);
-        return formData;
-    }
-
-    readDocDataFrom(dataResult) {
-        return new DocumentData(
-            dataResult['id'],
-            dataResult['name'],
-            dataResult['created_time'],
-            dataResult['url'],
-            dataResult['tag']
-        );
-    }
-
-    putExamData(examName, examDocIdsContent, examNumberQuestion, examDuration) {
-        const formData = new FormData();
-        formData.append('user_id', this._userData.getUserId());
-        formData.append('exam_name', examName);
-        formData.append('document_ids', JSON.stringify(examDocIdsContent));
-        formData.append('number_question', examNumberQuestion);
-        formData.append('exam_duration', examDuration);
-        return formData;
-    }
-
-    readExamDataFrom(dataResult) {
-        return new ExamData(
-            dataResult['id'],
-            dataResult['name'],
-            dataResult['number_question'],
-            dataResult['exam_duration'],
-            dataResult['document_ids']
-        );
     }
 
     async addDoc(docName, docTag, docFile, execute = () => {}) {

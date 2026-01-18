@@ -11,7 +11,6 @@ class Exam_Question(Base_Data):
         self.options = []
         self.correct_answer = ""
         self.explanation_vi = ""
-        pass
 
     def parse_form_json(self, json):
         self.doc_id, _ = os.path.splitext(json['doc_source'])

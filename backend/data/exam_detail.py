@@ -6,7 +6,6 @@ class Exam_Detail():
 
     def __init__(self):
         self.questions = []
-        self.exam_duration = 0
         pass
 
     def load_by(self, exam_data):
@@ -36,7 +35,10 @@ class Exam_Detail():
         for question in self.question:
             questions.append(question.get_dict(detail_mode))
 
-        return questions
+        return {
+            'detail_mode': detail_mode,
+            'questions': questions
+        }
     
     def get_point_by(self, answers):
         num_correct = 0
