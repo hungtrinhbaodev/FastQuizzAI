@@ -1,5 +1,7 @@
 import React from 'react';
 import './Footer.css';
+import AppConst from './services/AppConst';
+import appService from './services/AppService';
 
 const Footer = () => {
   return (
@@ -8,6 +10,14 @@ const Footer = () => {
       <div className="socials">
         <span>Facebook</span> | <span>GitHub</span>
       </div>
+      {AppConst.DEV_MODE && (
+        <button
+          className='footer-button-test-api'
+          onClick={() => {appService.onTestAPI()}}
+        >
+          TEST IAP
+        </button>
+      )}
     </footer>
   );
 };

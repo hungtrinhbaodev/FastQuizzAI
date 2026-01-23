@@ -22,7 +22,7 @@ class Exam_Question(Base_Data):
 
     def get_dict(self, detail_mode):
         if detail_mode == VIEW_EXAM_DETAIL_MODE.DOING.value:
-            return super.get_dict([
+            return super().get_dict([
                 'doc_id',
                 'category',
                 'correct_answer',

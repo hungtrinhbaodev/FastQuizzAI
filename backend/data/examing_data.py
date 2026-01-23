@@ -20,7 +20,7 @@ class Examing_Data(Base_Data):
         self.user_id = exam.user_id
         self.exam_id = exam.id
         self.anwsers = []
-        for self.anwsers in range(exam.number_question):
+        for _ in range(exam.number_question):
             self.anwsers.append(-1)
         self.state = EXAM_STATE.EXAMING.value
         self.start_time = utils.get_currrent_millisecond()

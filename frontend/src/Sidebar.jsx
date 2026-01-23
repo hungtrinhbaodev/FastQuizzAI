@@ -6,8 +6,9 @@ import appService from './services/AppService';
 import userAvatar from './assets/user.jpg'
 import UserInfo from './UserInfo';
 import './Sidebar.css';
+import DialogData from './data/DialogData';
 
-const Sidebar = ({ onSelect, currentId }) => {
+const Sidebar = ({ onSelect, currentId, useDialog}) => {
 
   const hasUser = appService.hasUser();
   const userData = appService.getUserData();
@@ -49,7 +50,11 @@ const Sidebar = ({ onSelect, currentId }) => {
           key={item.id}
           className={`sidebar-button ${currentId === item.id ? 'active' : ''}`}
           onClick={() => {
-            onSelect(item.id);
+            if (appService.getAppData().getAppState() === AppConst.APP_STATE.IDLE) {
+              onSelect(item.id);
+              return;
+            }
+            useDialog(DialogData.makeConfirmNotify("You're in examing phase can't open other tab!"));
           }}
         >
           {item.label}

@@ -38,6 +38,10 @@ class AppService {
         return this._docsData;
     }
 
+    /**
+     * 
+     * @returns {[ExamData]}
+     */
     getUserExams() {
         return this._examsData;
     }
@@ -68,6 +72,10 @@ class AppService {
 
     getExamingData() {
         return this._examingData;
+    }
+
+    onTestAPI() {
+        this.requestTestQuestion();
     }
 
     putDocData(docName, docTag, docFile) {
@@ -109,25 +117,30 @@ class AppService {
         );
     }
 
-    readDetailData(examDetailData) {
-        const detailViewMode = examDetailData['detail_mode'];
-        const examDetailData = new ExamDetailData(detailViewMode);
-        const questions = examDetailData['questions'];
-        for (const question of questions) {
-            const questionData = new ExamQuestionData();
-            questionData.questionText = question['question_text'];
-            questionData.options = question['options'];
-            switch (detailViewMode) {
-                case AppConst.EXAM_DETAIL_MODE.FULL: {
-                    questionData.correctAnswer = question['correct_answer'];
-                    questionData.docId = question['doc_id'];
-                    questionData.explain = question['explanation_vi'];
-                    break;
-                }
-                default: {
-                    break;
-                }
+    readQuestionDataFrom(question, detailViewMode) {
+        const questionData = new ExamQuestionData(detailViewMode);
+        questionData.questionText = question['question_text'];
+        questionData.options = question['options'];
+        switch (detailViewMode) {
+            case AppConst.EXAM_DETAIL_MODE.FULL: {
+                questionData.correctAnswer = question['correct_answer'];
+                questionData.docId = question['doc_id'];
+                questionData.explain = question['explanation_vi'];
+                break;
             }
+            default: {
+                break;
+            }
+        }
+        return questionData;
+    }
+
+    readDetailData(examDetail) {
+        const detailViewMode = examDetail['detail_mode'];
+        const examDetailData = new ExamDetailData(detailViewMode);
+        const questions = examDetail['questions'];
+        for (const question of questions) {
+            const questionData = this.readQuestionDataFrom(question, detailViewMode);
             examDetailData.addQuestionData(questionData);
         }
         return examDetailData;
@@ -182,7 +195,7 @@ class AppService {
         const response = await fetch(AppConst.SERVER_API_URL + router, requestOptions);
         
         if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
+            throw new Error(`Request failed with status ${response.status}`, response['error'] || "");
         }
 
         const text = await response.text();
@@ -461,6 +474,78 @@ class AppService {
                 console.error("Remove exam fail", e);
             }
 
+        }
+    }
+
+    async requestDoExam(examId, excute) {
+
+        const formData = new FormData();
+        formData.append("user_id", this._userData.getUserId())
+        formData.append("exam_id", examId);
+
+        try {
+
+            const result = await this._send(
+                AppConst.ROUTER.DO_EXAM,
+                AppConst.TYPE_SEND.POST,
+                formData
+            );
+
+            this._examingData = this.readExamingDataFrom(
+                result["examing_data"],
+                result['exam_detail']
+            );
+
+            const appData = result["app_data"];
+            this._appData.setAppState(appData["app_state"]);
+
+            if (typeof excute === "function") {
+                excute();
+            }
+        }
+        catch(e) {
+            console.error("Can't do exam with exam id", examId, e);
+        }
+    }
+
+    async requestTestQuestion() {
+
+        const result = await this._send(
+            AppConst.ROUTER.TEST_QUESTION_EXAM,
+            AppConst.TYPE_SEND.GET
+        );
+
+        try {
+
+            const data = this.readQuestionDataFrom(result['question_data'], result['detail_view_mode']);
+            console.log("requestTestQuestion", data);
+            return data;
+
+        } catch(e) {
+            console.error("Can't get test question data", e);
+        }
+
+        return null;
+    }
+
+    async requestChoseAnswerInExam(chosenIndex, indexQuestion) {
+        const formData = new FormData();
+        formData.append("user_id", this._userData.getUserId());
+        formData.append("index_question", indexQuestion);
+        formData.append("answer", chosenIndex);
+
+        try {
+            const result = await this._send(
+                AppConst.ROUTER.CHOSEN_ANSWER,
+                AppConst.TYPE_SEND.POST,
+                formData
+            );
+
+            appService._examingData.anwsers[indexQuestion] = chosenIndex;
+            this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAMING_DATA);
+        }
+        catch (e) {
+            console.error("Can't get test question data", e);
         }
     }
 }

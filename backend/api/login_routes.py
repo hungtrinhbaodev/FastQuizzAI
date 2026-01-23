@@ -21,7 +21,5 @@ def handle_login():
         exam_detail = app.get_detail_exam(examing_data.exam_id)
         login_data["examing_data"] = examing_data.get_dict()
         login_data["exam_detail"] = exam_detail.get_dict(detail_mode=VIEW_EXAM_DETAIL_MODE.DOING.value)
-    
 
-    if app_data.app_state != APP_STATE.EXEMING.value:
-        return jsonify(login_data), 201
+    return jsonify(login_data), 201

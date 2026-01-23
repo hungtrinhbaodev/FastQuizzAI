@@ -1,5 +1,5 @@
 import AppConst from "./services/AppConst";
-import {FaFileMedicalAlt, FaTrashAlt, FaRegAddressBook, FaFolderPlus} from 'react-icons/fa';
+import {FaFileMedicalAlt, FaRegSquare, FaTrashAlt, FaRegAddressBook, FaCheckSquare, FaFolderPlus} from 'react-icons/fa';
 
 const AppIcon = ({iconType, className}) => {
     return (
@@ -21,6 +21,16 @@ const AppIcon = ({iconType, className}) => {
             )}
             {iconType === AppConst.ICON_TYPE.ADD_FOLDER && (
                 <FaFolderPlus
+                    className={`${className}`}
+                />
+            )}
+            {iconType === AppConst.ICON_TYPE.CHECK_BOX && (
+                <FaCheckSquare
+                    className={`${className}`}
+                />
+            )}
+            {iconType === AppConst.ICON_TYPE.EMPTY_BOX && (
+                <FaRegSquare
                     className={`${className}`}
                 />
             )}

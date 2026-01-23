@@ -32,8 +32,8 @@ def create_exam():
     exam_data.user_id = request.form['user_id']
     exam_data.name = request.form['exam_name']
     exam_data.document_ids = json.loads(request.form.get('document_ids'))
-    exam_data.number_question = request.form['number_question']
-    exam_data.exam_duration = request.form['exam_duration']
+    exam_data.number_question = int(request.form['number_question'])
+    exam_data.exam_duration = int(request.form['exam_duration'])
 
     # Gen quiz by data here
     doc_urls = []

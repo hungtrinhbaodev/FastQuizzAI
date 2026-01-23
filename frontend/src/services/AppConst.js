@@ -35,6 +35,11 @@ const AppConst = {
 
         REMOVE_EXAM: "/remove-exam-api",
 
+        DO_EXAM: "/do-exam-api",
+
+        CHOSEN_ANSWER: "/chosen-anwser-api",
+
+        TEST_QUESTION_EXAM: "/test-question-api",
     },
 
     APP_STATE: {
@@ -103,6 +108,10 @@ const AppConst = {
 
         ADD_FOLDER: 4,
 
+        EMPTY_BOX: 5,
+
+        CHECK_BOX: 6
+
     },
 
     DEV_MODE: true,
@@ -122,8 +131,9 @@ const AppConst = {
 
         RELOAD_USER_DOCUMMENTS: 1,
 
-        RELOAD_USER_EXAMS: 2
+        RELOAD_USER_EXAMS: 2,
 
+        RELOAD_USER_EXAMING_DATA: 3,
     },
 
     SLIDER_STATE: {
@@ -164,8 +174,11 @@ const AppConst = {
     },
 
     EXAM_DETAIL_MODE: {
+
         FULL: 0,
+
         DOING: 1
+
     },
 
     MAX_DOC_IN_EXAM: 5,

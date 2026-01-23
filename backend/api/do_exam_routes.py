@@ -34,29 +34,39 @@ def do_exam():
     exam_id = request.form["exam_id"]
     exam = app.get_exam_by(exam_id)
 
+    print(exam.get_dict())
+
     if exam is None:
         return jsonify({"error": "Exam not found"}), 404
     
+    print("do_exam 2")
+
     if exam.user_id != user_id:
         return jsonify({"error": "You do not have permission to do this exam"}), 403
     
+    print("do_exam 3")
     app.update_examing_data(exam_id)
+    print("do_exam 4")
     app_data.app_state = APP_STATE.EXEMING.value
     app.save_app_data()
+    print("do_exam 5")
 
-    exam_detail = app.get_exam_info(exam_id)
+    exam_detail = app.get_detail_exam(exam_id)
+    print("do_exam 6")
     examing_data = app.get_examing_data()
+    print("do_exam 7")
 
     return jsonify({
+        "app_data": app_data.get_dict(),
         "exam_detail": exam_detail.get_dict(detail_mode=VIEW_EXAM_DETAIL_MODE.DOING.value),
         "examing_data": examing_data.get_dict()
     }), 201
 
-@do_exam("/chosen_anwser-api", methods=["POST"])
+@do_exam_bp.route("/chosen-anwser-api", methods=["POST"])
 def chosen_anwser():
 
     if 'user_id' not in request.form:
-        return jsonify({"error": "Missing user_id"})
+        return jsonify({"error": "Missing user_id"}), 401
     
     app = App.get_instance()
     app_data = app.get_app_data()
@@ -70,10 +80,12 @@ def chosen_anwser():
     if app_data.app_state != APP_STATE.EXEMING.value:
         return jsonify({"error": "App not in examing phase"}), 400
 
-    index_question = request.form['index_question']
-    answer = request.form['answer']
+    index_question = int(request.form['index_question'])
+    answer = int(request.form['answer'])
 
     examing_data = app.get_examing_data()
+
+    print("get time remain", examing_data.get_remaining_time())
 
     if examing_data.get_remaining_time() <= 0:
 
@@ -90,13 +102,15 @@ def chosen_anwser():
         }), 401
 
     examing_data.update_anwser(index_question, answer)
+    print(examing_data.anwsers)
+    app.save_examing_data()
 
     return jsonify({
         "app_state": app_data.app_state,
         "message": "Update answer successfully"
     }), 201
 
-@do_exam.route("/submit-exam-api", methods=["POST"])
+@do_exam_bp.route("/submit-exam-api", methods=["POST"])
 def submit_exam():
 
     if 'user_id' not in request.form:

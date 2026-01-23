@@ -12,7 +12,7 @@ import DialogData from './data/DialogData';
 import ButtonWithIcon from './ButtonWithIcon';
 
 
-const ViewExamPage = ({useLoading, useDialog, changePage}) => {
+const ViewExamPage = ({useLoading, useDialog, changePage, doExam}) => {
 
     const [tableData, setTableData] = useState(null);
 
@@ -87,7 +87,7 @@ const ViewExamPage = ({useLoading, useDialog, changePage}) => {
     }
 
     const addExam = () => {
-        const userDocs = appService.getUserDocs();
+        let userDocs = appService.getUserDocs();
         if (userDocs === null) {
             const loadingData = useLoading(LoadingData.makeLoading("Wait to process your request!"));
             (() => {
@@ -113,7 +113,6 @@ const ViewExamPage = ({useLoading, useDialog, changePage}) => {
         }
     }
 
-
     const onCellClick = (rowIndex, colIndex) => {
         if (colIndex === 5) {
             const examsData = appService.getUserExams();
@@ -129,6 +128,13 @@ const ViewExamPage = ({useLoading, useDialog, changePage}) => {
                     );
                 }
             ));
+        }
+
+        if (colIndex === 4) {
+            const examsData = appService.getUserExams();
+            const examData = examsData[rowIndex];
+            
+            doExam(examData.id);
         }
     }
 

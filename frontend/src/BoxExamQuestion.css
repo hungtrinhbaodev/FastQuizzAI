@@ -1,0 +1,29 @@
+.box-exam-question-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: var(--dialog-background-border);
+    border-radius: var(--dialog-background-border-radius);
+    padding: 10px;
+}
+
+.box-exam-question-sample-answer-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.box-exam-question-sample-answer-box {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.box-exam-question-label {
+    color: var(--primary-color);
+    font-size: 15px;
+}
+
+.box-exam-question-label-content {
+    font-size: 18px;
+}

@@ -8,6 +8,7 @@ from const import APP_STATE
 from data.examing_data import Examing_Data
 from data.exam_detail import Exam_Detail
 from data.exam_history import Exam_History
+from typing import Optional, List
 import uuid
 
 
@@ -145,6 +146,7 @@ class App:
         assert exam.user_id == self._app_data.current_user, "Exam must belong to current user"
         self._exams.append(exam)
         db_exam = exam.get_db_object("pk", "EXAM")
+        print('add_exam', db_exam)
         db.save_object_to_db(db_exam, "pk", "id")
 
     def add_history(self, exam_history):
@@ -154,9 +156,13 @@ class App:
         db.save_object_to_db(db_exam_history, "pk", "id")
 
     def update_examing_data(self, exam_id):
+        print("update_examing_data 1")
         exam = self.get_exam_by(exam_id)
+        print("update_examing_data 2")
         self._examing_data.load_from(exam)
-        self.save_examing_data
+        print("update_examing_data 3")
+        self.save_examing_data()
+        print("update_examing_data 4")
 
     def save_examing_data(self):
         db_object = self._examing_data.get_db_object("pk", "EXAMING")
@@ -193,8 +199,8 @@ class App:
         
         return False
 
-    def get_exam_info(self, exam_id):
-        return self._exam_infos   
+    def get_exam_info(self):
+        return self._exam_infos
 
     def get_current_user(self):
         return self.get_user(self._app_data.current_user)
@@ -211,13 +217,13 @@ class App:
     def get_docs(self):
         return self._docs
     
-    def get_exams(self):
+    def get_exams(self) -> List[Exam_Data]:
         return self._exams
     
     def get_app_data(self):
         return self._app_data
     
-    def get_detail_exam(self, exam_id):
+    def get_detail_exam(self, exam_id) -> Optional[Exam_Detail]:
         if not exam_id in self._exam_infos:
             exam = self.get_exam_by(exam_id)
             exam_detail = Exam_Detail()
@@ -226,7 +232,7 @@ class App:
         return self._exam_infos[exam_id]
     
     def get_examing_data(self):
-        return self.get_examing_data()
+        return self._examing_data
 
     @staticmethod
     def get_instance():

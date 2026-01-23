@@ -1,6 +1,7 @@
 from data.exam_question import Exam_Question
 import json
 from const import VIEW_EXAM_DETAIL_MODE
+from typing import List
 
 class Exam_Detail():
 
@@ -29,10 +30,13 @@ class Exam_Detail():
             self.questions = []
             print("load exam detail error", e)
 
+    def get_questions(self) -> List[Exam_Question]:
+        return self.questions
+
     def get_dict(self, detail_mode = VIEW_EXAM_DETAIL_MODE.FULL.value):
 
         questions = []
-        for question in self.question:
+        for question in self.questions:
             questions.append(question.get_dict(detail_mode))
 
         return {

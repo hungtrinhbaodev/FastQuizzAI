@@ -20,11 +20,14 @@ import ViewDocument from './ViewDocument';
 import ConfirmNotify from './ConfirmNotify';
 import AddExam from './AddExam';
 import ViewExamPage from './ViewExamPage';
+import ExamingPage from './ExamingPage';
 
 function App() {
 
   const [dialogData, setDialogData] = useState(DialogData.makeNone());
   const [loadingData, setLoadingData] = useState(LoadingData.makeNone());
+  const [examingData, setExamingData] = useState(null);
+
   const [page, setPage] = useState("");
 
   const useLoading = (loadingData) => {
@@ -52,6 +55,10 @@ function App() {
           onPageSelected("create_exam");
           break;
         }
+        case AppConst.APP_STATE.EXEMING: {
+          setExamingData(appService.getExamingData());
+          break;
+        }
         default: {
           if (AppConst.DEV_MODE) {
             // TODO: test here
@@ -74,6 +81,16 @@ function App() {
       return prev.copyWithSize(width, height);
     });
   }, []);
+
+  const onDoExam = (examId) => {
+    (async () => {
+        const loadingData = useLoading(LoadingData.makeLoading("Wait to make your exam"));
+        appService.requestDoExam(examId, () => {
+          setExamingData(appService.getExamingData());
+          useLoading(LoadingData.makeNone(loadingData));
+        });
+    })();
+  };
 
   return (
     <>
@@ -139,6 +156,7 @@ function App() {
       <Sidebar
         onSelect={onPageSelected}
         currentId={page}
+        useDialog={useDialog}
       />
       {appService.getAppData().getAppState() === AppConst.APP_STATE.IDLE
       &&  page === "create_exam"
@@ -155,6 +173,14 @@ function App() {
           useDialog={useDialog}
           useLoading={useLoading}
           changePage={onPageSelected}
+          doExam={onDoExam}
+        />)
+      }
+      {appService.getAppData().getAppState() === AppConst.APP_STATE.EXEMING
+      && examingData
+      && 
+        (<ExamingPage
+          iExamingData={examingData}
         />)
       }
     </div>
