@@ -1,0 +1,28 @@
+.exam-history-detail-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    gap: 10px;
+    padding: 10px;
+}
+
+.exam-history-detail-questions-container {
+    display: flex;
+    flex-direction: column;
+    height: 650px;
+    border-radius: 8px;
+
+    gap: 10px;
+
+    overflow-y: scroll;
+    overscroll-behavior: contain;
+    scrollbar-color: #888888 #f1f1f1; /* thumb color | track color */
+    scrollbar-width: auto;
+}
+
+.exam-history_detail-group-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}

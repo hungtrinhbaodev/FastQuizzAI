@@ -140,10 +140,23 @@ const ViewExamPage = ({useLoading, useDialog, changePage, doExam}) => {
 
     useEffect(() => {
 
+        const loadingData = useLoading(LoadingData.makeLoading("Wait to create your exams!"));
+        
         const listener = (subscribeType) => {
             switch (subscribeType) {
                 case AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAMS: {
+                    const userDocs = appService.getUserDocs();
+                    if (userDocs === null) {
+                        appService.requestUserDocs();
+                        break;
+                    }
                     setTableData(makeTableExamData(appService.getUserExams()));
+                    useLoading(LoadingData.makeNone(loadingData));
+                    break;
+                }
+                case AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DOCUMMENTS: {
+                    setTableData(makeTableExamData(appService.getUserExams()));
+                    useLoading(LoadingData.makeNone(loadingData));
                     break;
                 }
                 default: {
@@ -154,27 +167,24 @@ const ViewExamPage = ({useLoading, useDialog, changePage, doExam}) => {
 
         appService.subscribe(listener);
 
+        const userExams = appService.getUserExams();
+        const userDocs = appService.getUserDocs();
+        if (userExams === null) {
+            appService.requestExams();
+        }
+        else if (userDocs === null){
+            appService.requestUserDocs();
+        }
+        else {
+            setTableData(makeTableExamData(userExams));
+            useLoading(LoadingData.makeNone(loadingData));
+        }
+
         return () => {
             appService.unsubscribe(AppConst.SUBSCRIBE_TYPE.RELOAD_EXAMS);
         }
 
     }, []);
-
-    useEffect(() => {
-        
-        const loadingData = useLoading(LoadingData.makeLoading("Wait to create your exams!"));
-
-        (async () => {
-
-            const examsData = await appService.requestExams();
-            setTableData(makeTableExamData(examsData));
-
-            useLoading(LoadingData.makeNone(loadingData));
-
-        })();
-
-    }, []);
-
 
     return (
         <div

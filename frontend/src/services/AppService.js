@@ -1,553 +1,700 @@
-import AppData from "../data/AppData";
-import DocumentData from "../data/DocumentData";
-import UserData from "../data/UserData";
-import AppConst from "./AppConst";
-import ExamData from "../data/ExamData";
-import App from "../App";
-import ExamDetailData from "../data/ExamDetailData";
-import ExamQuestionData from "../data/ExamQuestionData";
-import ExamingData from "../data/ExamingData";
-
+import AppData from '../data/AppData';
+import DocumentData from '../data/DocumentData';
+import UserData from '../data/UserData';
+import AppConst from './AppConst';
+import ExamData from '../data/ExamData';
+import App from '../App';
+import ExamDetailData from '../data/ExamDetailData';
+import ExamQuestionData from '../data/ExamQuestionData';
+import ExamingData from '../data/ExamingData';
+import ExamHistoryData from '../data/ExamHistory';
 
 class AppService {
+  constructor() {
+    this._userData = new UserData();
+    this._appData = new AppData();
+    this._docsData = null;
+    this._examsData = null;
+    this._examingData = null;
+    this._historiesData = null;
+    this._listeners = [];
+  }
 
-    constructor() {
-        this._userData = new UserData();
-        this._appData = new AppData();
-        this._docsData = null;
-        this._examsData = null;
-        this._examingData = null;
-        this._listeners = [];
+  /**
+   * @returns {AppData}
+   */
+  getAppData() {
+    return this._appData;
+  }
+
+  /**
+   * @returns {UserData}
+   */
+  getUserData() {
+    return this._userData;
+  }
+
+  getUserDocs() {
+    return this._docsData;
+  }
+
+  /**
+   *
+   * @returns {[ExamData]}
+   */
+  getUserExams() {
+    return this._examsData;
+  }
+
+  /**
+   * @param {Number} examId
+   * @returns {ExamData}
+   */
+  getExamBy(examId) {
+    return (
+      this._examsData && this._examsData.find((exam) => exam.id === examId)
+    );
+  }
+
+  subscribe(listener) {
+    this._listeners.push(listener);
+  }
+
+  unsubscribe(listener) {
+    this._listeners = this._listeners.filter((l) => l !== listener);
+  }
+
+  _notify(subscribeType) {
+    this._listeners.forEach((listener) => listener(subscribeType));
+  }
+
+  hasUser() {
+    return (
+      this._appData.getAppState() !== AppConst.APP_STATE.NO_LOGIN &&
+      this._userData.getUserName() !== ''
+    );
+  }
+
+  getDocBy(docId) {
+    return this._docsData.find((doc) => doc.id === docId);
+  }
+
+  getExanBy(examId) {
+    return this._examsData.find((exam) => exam.id === examId);
+  }
+
+  getExamingData() {
+    return this._examingData;
+  }
+
+  onTestAPI() {
+    this.requestTestQuestion();
+  }
+
+  getHistoriesData() {
+    return this._historiesData;
+  }
+
+  getHistoryDataBy(historyId) {
+    return this._historiesData.find((history) => history.id === historyId);
+  }
+
+  putDocData(docName, docTag, docFile) {
+    const formData = new FormData();
+    formData.append('user_id', this._userData.getUserId());
+    formData.append('doc_name', docName);
+    formData.append('doc_tag', docTag);
+    formData.append('document', docFile);
+    return formData;
+  }
+
+  readDocDataFrom(dataResult) {
+    return new DocumentData(
+      dataResult['id'],
+      dataResult['name'],
+      dataResult['created_time'],
+      dataResult['url'],
+      dataResult['tag']
+    );
+  }
+
+  putExamData(examName, examDocIdsContent, examNumberQuestion, examDuration) {
+    const formData = new FormData();
+    formData.append('user_id', this._userData.getUserId());
+    formData.append('exam_name', examName);
+    formData.append('document_ids', JSON.stringify(examDocIdsContent));
+    formData.append('number_question', examNumberQuestion);
+    formData.append('exam_duration', examDuration);
+    return formData;
+  }
+
+  readExamDataFrom(dataResult) {
+    return new ExamData(
+      dataResult['id'],
+      dataResult['name'],
+      dataResult['number_question'],
+      dataResult['exam_duration'],
+      dataResult['document_ids']
+    );
+  }
+
+  readQuestionDataFrom(question, detailViewMode) {
+    const questionData = new ExamQuestionData(detailViewMode);
+    questionData.questionText = question['question_text'];
+    questionData.options = question['options'];
+    switch (detailViewMode) {
+      case AppConst.EXAM_DETAIL_MODE.FULL: {
+        questionData.correctAnswer = question['correct_answer'];
+        questionData.docId = question['doc_id'];
+        questionData.explain = question['explanation_vi'];
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    return questionData;
+  }
+
+  readDetailData(examDetail) {
+    const detailViewMode = examDetail['detail_mode'];
+    const examDetailData = new ExamDetailData(detailViewMode);
+    const questions = examDetail['questions'];
+    for (const question of questions) {
+      const questionData = this.readQuestionDataFrom(question, detailViewMode);
+      examDetailData.addQuestionData(questionData);
+    }
+    return examDetailData;
+  }
+
+  readExamingDataFrom(examingData, examDetailData) {
+    return new ExamingData(
+      examingData['exam_id'],
+      examingData['remaining_time'],
+      examingData['anwsers'],
+      this.readDetailData(examDetailData)
+    );
+  }
+
+  readExamHistoryBy(examHistory) {
+    return new ExamHistoryData(
+      examHistory['id'],
+      examHistory['user_id'],
+      examHistory['exam_id'],
+      examHistory['doing_time'],
+      examHistory['start_time'],
+      examHistory['exam_answers'],
+      examHistory['exam_point'],
+      examHistory['correct_answers']
+    );
+  }
+
+  /**
+   * @param {*} router
+   * @param {*} typeSend
+   * @param {*} body
+   * @returns
+   */
+  async _send(router = '', typeSend = AppConst.TYPE_SEND.GET, body = null) {
+    const isFormData = body instanceof FormData;
+
+    const methodMap = {
+      [AppConst.TYPE_SEND.GET]: 'GET',
+      [AppConst.TYPE_SEND.POST]: 'POST',
+      [AppConst.TYPE_SEND.PUT]: 'PUT',
+      [AppConst.TYPE_SEND.DELETE]: 'DELETE'
+    };
+
+    const requestOptions = {
+      method: methodMap[typeSend] || 'GET',
+      headers: {} // Let the browser set Content-Type for FormData
+    };
+
+    if (!isFormData) {
+      requestOptions.headers['Content-Type'] = 'application/json';
     }
 
-    /**
-     * @returns {AppData}
-     */
-    getAppData() {
-        return this._appData;
+    if (body) {
+      if (isFormData) {
+        requestOptions.body = body;
+      } else if (requestOptions.method !== 'GET') {
+        requestOptions.body = JSON.stringify(body);
+      }
     }
 
-    /**
-     * @returns {UserData}
-     */
-    getUserData() {
-        return this._userData;
+    const response = await fetch(
+      AppConst.SERVER_API_URL + router,
+      requestOptions
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Request failed with status ${response.status}`,
+        response['error'] || ''
+      );
     }
 
-    getUserDocs() {
-        return this._docsData;
+    const text = await response.text();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.error('Server returned invalid JSON. Response body:', text);
+      throw new Error(
+        'The server returned HTML instead of JSON. Check your API URL.'
+      );
+    }
+  }
+
+  /**
+   * @param {function()} excute
+   */
+  async login(excute = () => {}) {
+    const result = await this._send(
+      AppConst.ROUTER.LOGIN,
+      AppConst.TYPE_SEND.GET
+    );
+
+    if (!result) {
+      // TODO: add dialog notify get fail
+      return;
     }
 
-    /**
-     * 
-     * @returns {[ExamData]}
-     */
-    getUserExams() {
-        return this._examsData;
+    // Update data login is send
+    const appData = result['app_data'];
+    this._appData.setAppState(appData['app_state']);
+
+    switch (this._appData.getAppState()) {
+      case AppConst.APP_STATE.NO_LOGIN: {
+        break;
+      }
+      default: {
+        const userData = result['current_user'];
+        this._userData.setUserId(userData['id']);
+        this._userData.setUserName(userData['name']);
+        this._userData.setUserAvatar(userData['avatar']);
+        break;
+      }
     }
 
-    subscribe(listener) {
-        this._listeners.push(listener);
-    }
-
-    unsubscribe(listener) {
-        this._listeners = this._listeners.filter(l => l !== listener);
-    }
-
-    _notify(subscribeType) {
-        this._listeners.forEach(listener => listener(subscribeType));
-    }
-
-    hasUser() {
-        return this._appData.getAppState() !== AppConst.APP_STATE.NO_LOGIN && this._userData.getUserName() !== "";
-    }
-
-    getDocBy(docId) {
-        return this._docsData.find(doc => doc.id === docId);
-    }
-
-    getExanBy(examId) {
-        return this._examsData.find(exam => exam.id === examId);
-    }
-
-    getExamingData() {
-        return this._examingData;
-    }
-
-    onTestAPI() {
-        this.requestTestQuestion();
-    }
-
-    putDocData(docName, docTag, docFile) {
-        const formData = new FormData();
-        formData.append('user_id', this._userData.getUserId());
-        formData.append('doc_name', docName);
-        formData.append('doc_tag', docTag);
-        formData.append('document', docFile);
-        return formData;
-    }
-
-    readDocDataFrom(dataResult) {
-        return new DocumentData(
-            dataResult['id'],
-            dataResult['name'],
-            dataResult['created_time'],
-            dataResult['url'],
-            dataResult['tag']
+    switch (this._appData.getAppState()) {
+      case AppConst.APP_STATE.EXEMING: {
+        this._examingData = this.readExamingDataFrom(
+          result['examing_data'],
+          result['exam_detail']
         );
+        break;
+      }
+      default: {
+        break;
+      }
     }
 
-    putExamData(examName, examDocIdsContent, examNumberQuestion, examDuration) {
-        const formData = new FormData();
-        formData.append('user_id', this._userData.getUserId());
-        formData.append('exam_name', examName);
-        formData.append('document_ids', JSON.stringify(examDocIdsContent));
-        formData.append('number_question', examNumberQuestion);
-        formData.append('exam_duration', examDuration);
-        return formData;
+    this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DATA);
+
+    // Call excute login callback in App
+    if (typeof excute === 'function') {
+      excute(this, result);
     }
+  }
 
-    readExamDataFrom(dataResult) {
-        return new ExamData(
-            dataResult['id'],
-            dataResult['name'],
-            dataResult['number_question'],
-            dataResult['exam_duration'],
-            dataResult['document_ids']
-        );
+  async createAccount(userName, avatarFile, onSuccess = () => {}) {
+    const formData = new FormData();
+    formData.append('userName', userName);
+    formData.append('avatar', avatarFile);
+
+    try {
+      const result = await this._send(
+        AppConst.ROUTER.CREATE_ACCOUNT,
+        AppConst.TYPE_SEND.POST,
+        formData
+      );
+
+      const appData = result['app_data'];
+      // The backend returns the full app_data object on success
+      this._appData.setAppState(appData['app_state']);
+      const userData = result['current_user'];
+      this._userData.setUserId(userData['id']);
+      this._userData.setUserName(userData['name']);
+      this._userData.setUserAvatar(userData['avatar']);
+
+      this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DATA);
+
+      onSuccess();
+    } catch (error) {
+      console.error('Account creation failed:', error);
+      // TODO: Show an error dialog to the user
     }
+  }
 
-    readQuestionDataFrom(question, detailViewMode) {
-        const questionData = new ExamQuestionData(detailViewMode);
-        questionData.questionText = question['question_text'];
-        questionData.options = question['options'];
-        switch (detailViewMode) {
-            case AppConst.EXAM_DETAIL_MODE.FULL: {
-                questionData.correctAnswer = question['correct_answer'];
-                questionData.docId = question['doc_id'];
-                questionData.explain = question['explanation_vi'];
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-        return questionData;
+  async addDoc(docName, docTag, docFile, execute = () => {}) {
+    const formData = this.putDocData(docName, docTag, docFile);
+
+    try {
+      const result = await this._send(
+        AppConst.ROUTER.ADD_DOCUMENT,
+        AppConst.TYPE_SEND.POST,
+        formData
+      );
+
+      const resultData = result['doc_data'];
+      const docData = this.readDocDataFrom(resultData);
+
+      if (!this._docsData) {
+        this._docsData = [];
+      }
+
+      this._docsData.push(docData);
+
+      this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DOCUMMENTS);
+
+      if (typeof execute == 'function') {
+        execute(docData);
+      }
+    } catch (error) {
+      console.error('Add document fail', error);
     }
+  }
 
-    readDetailData(examDetail) {
-        const detailViewMode = examDetail['detail_mode'];
-        const examDetailData = new ExamDetailData(detailViewMode);
-        const questions = examDetail['questions'];
-        for (const question of questions) {
-            const questionData = this.readQuestionDataFrom(question, detailViewMode);
-            examDetailData.addQuestionData(questionData);
-        }
-        return examDetailData;
-    }
+  async requestUserDocs(isForce = false) {
+    if (this._docsData === null || isForce) {
+      const formData = new FormData();
+      formData.append('user_id', this._userData.getUserId());
 
-    readExamingDataFrom(examingData, examDetailData) {
-        return new ExamingData(
-            examingData['exam_id'],
-            examingData['remaining_time'],
-            examingData['anwsers'],
-            this.readDetailData(examDetailData)
-        );
-    }
-
-    /**
-     * @param {*} router 
-     * @param {*} typeSend 
-     * @param {*} body 
-     * @returns 
-     */
-    async _send(
-        router = "",
-        typeSend = AppConst.TYPE_SEND.GET,
-        body = null
-    ) {
-        const isFormData = body instanceof FormData;
-
-        const methodMap = {
-            [AppConst.TYPE_SEND.GET]: 'GET',
-            [AppConst.TYPE_SEND.POST]: 'POST',
-            [AppConst.TYPE_SEND.PUT]: 'PUT',
-            [AppConst.TYPE_SEND.DELETE]: 'DELETE'
-        };
-
-        const requestOptions = {
-            method: methodMap[typeSend] || 'GET',
-            headers: {} // Let the browser set Content-Type for FormData
-        };
-
-        if (!isFormData) {
-            requestOptions.headers['Content-Type'] = 'application/json';
-        }
-
-        if (body) {
-            if (isFormData) {
-                requestOptions.body = body;
-            } else if (requestOptions.method !== 'GET') {
-                requestOptions.body = JSON.stringify(body);
-            }
-        }
-
-        const response = await fetch(AppConst.SERVER_API_URL + router, requestOptions);
-        
-        if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`, response['error'] || "");
-        }
-
-        const text = await response.text();
-        try {
-            return JSON.parse(text);
-        } catch (e) {
-            console.error("Server returned invalid JSON. Response body:", text);
-            throw new Error("The server returned HTML instead of JSON. Check your API URL.");
-        }
-    }
-
-    /**
-     * @param {function()} excute 
-     */
-    async login(excute = () => {}) {
+      try {
         const result = await this._send(
-            AppConst.ROUTER.LOGIN,
-            AppConst.TYPE_SEND.GET
+          AppConst.ROUTER.GET_DOCUMENTS,
+          AppConst.TYPE_SEND.POST,
+          formData
         );
 
-        if (!result) {
-            // TODO: add dialog notify get fail
-            return;
-        }
-        
-        // Update data login is send
-        const appData = result["app_data"];
-        this._appData.setAppState(appData["app_state"]);
-
-        switch (this._appData.getAppState()) {
-            case AppConst.APP_STATE.NO_LOGIN: {
-                break;
-            }
-            default: {
-                const userData = result["current_user"];
-                this._userData.setUserId(userData["id"]);
-                this._userData.setUserName(userData["name"]);
-                this._userData.setUserAvatar(userData["avatar"]);
-                break;
-            }
+        this._docsData = [];
+        const resultDocsData = result['docs_data'];
+        for (const resultDocData of resultDocsData) {
+          const docData = this.readDocDataFrom(resultDocData);
+          this._docsData.push(docData);
         }
 
-        switch (this._appData.getAppState()) {
-            case AppConst.APP_STATE.EXEMING: {
-                this._examingData = this.readExamingDataFrom(
-                    result['examing_data'],
-                    result['exam_detail']
-                );
-                break;
-            }
-            default: {
-                break;
-            }
-        }
+        this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DOCUMMENTS);
 
-        this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DATA);
-
-        // Call excute login callback in App
-        if (typeof excute === "function") {
-            excute(this, result);
-        }
-    }
-
-    async createAccount(userName, avatarFile, onSuccess = () => {}) {
-        const formData = new FormData();
-        formData.append('userName', userName);
-        formData.append('avatar', avatarFile);
-
-        try {
-            const result = await this._send(
-                AppConst.ROUTER.CREATE_ACCOUNT,
-                AppConst.TYPE_SEND.POST,
-                formData
-            );
-
-            // The backend returns the full app_data object on success
-            this._appData.setAppState(result["app_state"]);
-            const userData = result["current_user"];
-            this._userData.setUserId(userData["id"]);
-            this._userData.setUserName(userData["name"]);
-            this._userData.setUserAvatar(userData["avatar"]);
-
-            this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DATA);
-
-            onSuccess();
-        } catch (error) {
-            console.error("Account creation failed:", error);
-            // TODO: Show an error dialog to the user
-        }
-    }
-
-    async addDoc(docName, docTag, docFile, execute = () => {}) {
-        const formData = this.putDocData(docName, docTag, docFile);
-
-        try {
-            const result = await this._send(
-                AppConst.ROUTER.ADD_DOCUMENT,
-                AppConst.TYPE_SEND.POST,
-                formData
-            );
-
-            const resultData = result['doc_data'];
-            const docData = this.readDocDataFrom(resultData);
-
-            if (!this._docsData) {
-                this._docsData = [];
-            }
-
-            this._docsData.push(docData);
-
-            this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DOCUMMENTS);
-
-            if (typeof execute == "function") {
-                execute(docData);
-            }
-
-        } catch(error) {
-            console.error("Add document fail", error);
-        }
-
-    }
-
-    async requestUserDocs(isForce = false) {
-        if (this._docsData === null || isForce) {
-
-            const formData = new FormData();
-            formData.append('user_id', this._userData.getUserId());
-
-            try {
-                
-                const result = await this._send(
-                    AppConst.ROUTER.GET_DOCUMENTS,
-                    AppConst.TYPE_SEND.POST,
-                    formData
-                );
-
-                this._docsData = [];
-                const resultDocsData = result['docs_data'];
-                for (const resultDocData of resultDocsData) {
-                    const docData = this.readDocDataFrom(resultDocData);
-                    this._docsData.push(docData);
-                }
-
-                return this._docsData;
-
-            } catch (e) {
-                console.error("Get user docs fail", e);
-            }
-        }
         return this._docsData;
+      } catch (e) {
+        console.error('Get user docs fail', e);
+      }
     }
+    return this._docsData;
+  }
 
-    async removeDoc(docId, excute) {
+  async removeDoc(docId, excute) {
+    const formData = new FormData();
+    formData.append('user_id', this._userData.getUserId());
+    formData.append('doc_id', docId);
 
-        const formData = new FormData();
-        formData.append('user_id', this._userData.getUserId());
-        formData.append('doc_id', docId);
+    try {
+      const result = await this._send(
+        AppConst.ROUTER.REMOVE_DOCUMENT,
+        AppConst.TYPE_SEND.POST,
+        formData
+      );
 
-        try {
+      this._docsData = this._docsData.filter((doc) => doc.id !== docId);
+      this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DOCUMMENTS);
 
-            const result = await this._send(
-                AppConst.ROUTER.REMOVE_DOCUMENT,
-                AppConst.TYPE_SEND.POST,
-                formData
-            );
+      if (typeof excute == 'function') {
+        excute(result);
+      }
+    } catch (e) {
+      console.error('Remove doc fail', e);
+    }
+  }
 
-            this._docsData = this._docsData.filter(doc => doc.id !== docId);
-            this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_DOCUMMENTS);
+  async requestExams(isForce = false) {
+    if (this._examsData === null || isForce) {
+      const formData = new FormData();
+      formData.append('user_id', this._userData.getUserId());
 
-            if (typeof excute == 'function') {
-                excute(result);
-            }
+      try {
+        const result = await this._send(
+          AppConst.ROUTER.GET_EXAMS,
+          AppConst.TYPE_SEND.POST,
+          formData
+        );
 
-        } catch (e) {
-            console.error("Remove doc fail", e);
+        const exams = result['exams_data'];
+        this._examsData = [];
+
+        for (const exam of exams) {
+          this._examsData.push(this.readExamDataFrom(exam));
         }
-    } 
 
-    async requestExams(isForce = false) {
-
-        if (this._examsData === null || isForce) {
-
-            const formData = new FormData();
-            formData.append('user_id', this._userData.getUserId());
-            
-            try {
-
-                const result = await this._send(
-                    AppConst.ROUTER.GET_EXAMS,
-                    AppConst.TYPE_SEND.POST,
-                    formData     
-                );
-
-                const exams = result['exams_data'];
-                console.log("Get exams", exams);
-                this._examsData = [];
-
-                for (const exam of exams) {
-                    this._examsData.push(this.readExamDataFrom(exam));
-                }
-
-                return this._examsData;
-
-            } catch (e) {
-                console.error("Get user exams fail", e);
-            }
-
-        }
+        this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAMS);
 
         return this._examsData;
+      } catch (e) {
+        console.error('Get user exams fail', e);
+      }
     }
 
-    async addExam(
-        examName,
-        examDocIdsContent,
-        examNumberQuestion,
-        examDuration,
-        execute = () => {}
-    ) {
-        const formData = this.putExamData(examName, examDocIdsContent, examNumberQuestion, examDuration);
-        try {
+    return this._examsData;
+  }
 
-            const result = await this._send(
-                AppConst.ROUTER.CREATE_EXAM,
-                AppConst.TYPE_SEND.POST,
-                formData
-            );
+  async addExam(
+    examName,
+    examDocIdsContent,
+    examNumberQuestion,
+    examDuration,
+    execute = () => {}
+  ) {
+    const formData = this.putExamData(
+      examName,
+      examDocIdsContent,
+      examNumberQuestion,
+      examDuration
+    );
+    try {
+      const result = await this._send(
+        AppConst.ROUTER.CREATE_EXAM,
+        AppConst.TYPE_SEND.POST,
+        formData
+      );
 
-            const exam = result['exam_data'];
+      const exam = result['exam_data'];
 
-            const examData = this.readExamDataFrom(exam);
+      const examData = this.readExamDataFrom(exam);
 
-            if (!this._examsData) {
-                this._examsData = await this.requestExams();
-            }
-            else {
-                this._examsData.push(examData);
-            }
-            
-            this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAMS);
+      if (!this._examsData) {
+        this._examsData = await this.requestExams();
+      } else {
+        this._examsData.push(examData);
+        this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAMS);
+      }
 
-            if (typeof execute == 'function') {
-                execute(exam);
-            }
-            
-        } catch (e) {
-            console.error("Add exam fail", e);
-        }
+      if (typeof execute == 'function') {
+        execute(exam);
+      }
+    } catch (e) {
+      console.error('Add exam fail', e);
     }
-    
-    async removeExam(examId, execute = () => {}) {
-        const examData = this.getExanBy(examId);
-        if (examData) {
+  }
 
-            const formData = new FormData();
-            formData.append('user_id', this._userData.getUserId());
-            formData.append('exam_id', examId);
+  async removeExam(examId, execute = () => {}) {
+    const examData = this.getExanBy(examId);
+    if (examData) {
+      const formData = new FormData();
+      formData.append('user_id', this._userData.getUserId());
+      formData.append('exam_id', examId);
 
-            try {
-
-                const result = await this._send(
-                    AppConst.ROUTER.REMOVE_EXAM,
-                    AppConst.TYPE_SEND.POST,
-                    formData
-                );
-
-                this._examsData = this._examsData.filter(exam => exam.id !== examId);
-
-                this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAMS);
-
-                if (typeof execute == 'function') {
-                    execute(result);
-                }
-
-            } catch (e) {
-                console.error("Remove exam fail", e);
-            }
-
-        }
-    }
-
-    async requestDoExam(examId, excute) {
-
-        const formData = new FormData();
-        formData.append("user_id", this._userData.getUserId())
-        formData.append("exam_id", examId);
-
-        try {
-
-            const result = await this._send(
-                AppConst.ROUTER.DO_EXAM,
-                AppConst.TYPE_SEND.POST,
-                formData
-            );
-
-            this._examingData = this.readExamingDataFrom(
-                result["examing_data"],
-                result['exam_detail']
-            );
-
-            const appData = result["app_data"];
-            this._appData.setAppState(appData["app_state"]);
-
-            if (typeof excute === "function") {
-                excute();
-            }
-        }
-        catch(e) {
-            console.error("Can't do exam with exam id", examId, e);
-        }
-    }
-
-    async requestTestQuestion() {
-
+      try {
         const result = await this._send(
-            AppConst.ROUTER.TEST_QUESTION_EXAM,
-            AppConst.TYPE_SEND.GET
+          AppConst.ROUTER.REMOVE_EXAM,
+          AppConst.TYPE_SEND.POST,
+          formData
         );
 
-        try {
+        this._examsData = this._examsData.filter((exam) => exam.id !== examId);
 
-            const data = this.readQuestionDataFrom(result['question_data'], result['detail_view_mode']);
-            console.log("requestTestQuestion", data);
-            return data;
+        this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAMS);
 
-        } catch(e) {
-            console.error("Can't get test question data", e);
+        if (typeof execute == 'function') {
+          execute(result);
         }
+      } catch (e) {
+        console.error('Remove exam fail', e);
+      }
+    }
+  }
 
-        return null;
+  async requestDoExam(examId, excute) {
+    const formData = new FormData();
+    formData.append('user_id', this._userData.getUserId());
+    formData.append('exam_id', examId);
+
+    try {
+      const result = await this._send(
+        AppConst.ROUTER.DO_EXAM,
+        AppConst.TYPE_SEND.POST,
+        formData
+      );
+
+      this._examingData = this.readExamingDataFrom(
+        result['examing_data'],
+        result['exam_detail']
+      );
+
+      const appData = result['app_data'];
+      this._appData.setAppState(appData['app_state']);
+
+      if (typeof excute === 'function') {
+        excute();
+      }
+    } catch (e) {
+      console.error("Can't do exam with exam id", examId, e);
+    }
+  }
+
+  async requestTestQuestion() {
+    const result = await this._send(
+      AppConst.ROUTER.TEST_QUESTION_EXAM,
+      AppConst.TYPE_SEND.GET
+    );
+
+    try {
+      const data = this.readQuestionDataFrom(
+        result['question_data'],
+        result['detail_view_mode']
+      );
+      console.log('requestTestQuestion', data);
+      return data;
+    } catch (e) {
+      console.error("Can't get test question data", e);
     }
 
-    async requestChoseAnswerInExam(chosenIndex, indexQuestion) {
-        const formData = new FormData();
-        formData.append("user_id", this._userData.getUserId());
-        formData.append("index_question", indexQuestion);
-        formData.append("answer", chosenIndex);
+    return null;
+  }
 
-        try {
-            const result = await this._send(
-                AppConst.ROUTER.CHOSEN_ANSWER,
-                AppConst.TYPE_SEND.POST,
-                formData
-            );
+  async requestChoseAnswerInExam(chosenIndex, indexQuestion) {
+    const formData = new FormData();
+    formData.append('user_id', this._userData.getUserId());
+    formData.append('index_question', indexQuestion);
+    formData.append('answer', chosenIndex);
 
-            appService._examingData.anwsers[indexQuestion] = chosenIndex;
-            this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAMING_DATA);
-        }
-        catch (e) {
-            console.error("Can't get test question data", e);
-        }
+    try {
+      const result = await this._send(
+        AppConst.ROUTER.CHOSEN_ANSWER,
+        AppConst.TYPE_SEND.POST,
+        formData
+      );
+
+      this._examingData.anwsers[indexQuestion] = chosenIndex;
+      this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAMING_DATA);
+    } catch (e) {
+      console.error("Can't get test question data", e);
     }
+  }
+
+  async submitExam(excute = (historyData) => {}) {
+    const formData = new FormData();
+    formData.append('user_id', this._userData.getUserId());
+
+    try {
+      const result = await this._send(
+        AppConst.ROUTER.SUBMIT_EXAM,
+        AppConst.TYPE_SEND.POST,
+        formData
+      );
+
+      console.log('submitExam', result);
+
+      this._appData.setAppState(result['app_state']);
+      const historyData = this.readExamHistoryBy(result['exam_history']);
+
+      if (this._historiesData === null) {
+        this.requestHistoriesData();
+      } else {
+        this._historiesData.push(historyData);
+      }
+
+      if (typeof excute === 'function') {
+        excute(historyData);
+      }
+    } catch (e) {
+      console.error("Can't submit exam", e);
+    }
+  }
+
+  async requestHistoriesData(isForce = false) {
+    if (this._historiesData === null || isForce) {
+      const formData = new FormData();
+      formData.append('user_id', this._userData.getUserId());
+
+      try {
+        const result = await this._send(
+          AppConst.ROUTER.GET_HISRORIES,
+          AppConst.TYPE_SEND.POST,
+          formData
+        );
+
+        this._historiesData = [];
+        const histories = result['exam_histories_data'];
+        for (const history of histories) {
+          const historyData = this.readExamHistoryBy(history);
+          this._historiesData.push(historyData);
+        }
+
+        this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAM_HISTORY);
+
+        return this._historiesData;
+      } catch (e) {
+        console.error("Can't get histories data", e);
+      }
+    }
+
+    return this._historiesData;
+  }
+
+  async requestExamHistoryDetail(historyId, execute = () => {}) {
+    const formData = new FormData();
+    formData.append('user_id', this._userData.getUserId());
+    formData.append('exam_history_id', historyId);
+
+    try {
+      const result = await this._send(
+        AppConst.ROUTER.GET_HISTORY_DETAIL,
+        AppConst.TYPE_SEND.POST,
+        formData
+      );
+
+      const examDetail = this.readDetailData(result['exam_detail']);
+      const historyData = this.getHistoryDataBy(historyId);
+
+      if (typeof execute === 'function') {
+        execute(examDetail, historyData);
+      }
+    } catch (e) {
+      console.error("Can't get exam history detail", e);
+    }
+  }
+
+  async removeHistoryExam(historyId, execute = () => {}) {
+    const formData = new FormData();
+    formData.append('user_id', this._userData.getUserId());
+    formData.append('exam_history_id', historyId);
+
+    try {
+      const result = await this._send(
+        AppConst.ROUTER.REMOVE_EXAM_HISTORY,
+        AppConst.TYPE_SEND.POST,
+        formData
+      );
+
+      this._historiesData = this._historiesData.filter(
+        (history) => history.id !== historyId
+      );
+
+      this._notify(AppConst.SUBSCRIBE_TYPE.RELOAD_USER_EXAM_HISTORY);
+
+      if (typeof execute === 'function') {
+        execute(result);
+      }
+    } catch (e) {
+      console.error("Can't delete exam history", e);
+    }
+  }
+
+  async shutdownServer() {
+    try {
+      await this._send(AppConst.ROUTER.SHUTDOWN_SERVER, AppConst.TYPE_SEND.GET);
+    } catch (e) {
+      console.error("Can't shutdown server", e);
+    }
+  }
+
+  async sendPing() {
+    try {
+      await this._send(AppConst.ROUTER.PING_SERVER, AppConst.TYPE_SEND.GET);
+    } catch (e) {
+      console.error("Can't ping server", e);
+    }
+  }
 }
 
 const appService = new AppService();

@@ -31,3 +31,4 @@ backend/assets/*
 backend/*/__pycache__
 backend/build
 main.spec
+release

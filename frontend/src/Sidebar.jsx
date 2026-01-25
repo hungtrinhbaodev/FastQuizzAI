@@ -34,7 +34,16 @@ const Sidebar = ({ onSelect, currentId, useDialog}) => {
     { id: 'create_exam', label: 'Create Exam' },
     { id: 'view_exam', label: 'View Exam' },
     { id: 'exam_history', label: 'Exam History' },
+    { id: 'examing', label: 'Examing' },
   ];
+
+  const getButtonStyles = (id) => {
+    const styles = {};
+    if (id == 'examing') {
+      appService.getAppData().getAppState() !== AppConst.APP_STATE.EXEMING && (styles['display'] = 'none');
+    }
+    return styles;
+  };
 
   return (
     <div className="sidebar"> 
@@ -49,12 +58,15 @@ const Sidebar = ({ onSelect, currentId, useDialog}) => {
         <button
           key={item.id}
           className={`sidebar-button ${currentId === item.id ? 'active' : ''}`}
+          style={getButtonStyles(item.id)}
           onClick={() => {
             if (appService.getAppData().getAppState() === AppConst.APP_STATE.IDLE) {
               onSelect(item.id);
               return;
             }
-            useDialog(DialogData.makeConfirmNotify("You're in examing phase can't open other tab!"));
+            if (appService.getAppData().getAppState() === AppConst.APP_STATE.EXEMING) {
+              useDialog(DialogData.makeConfirmNotify("You're in examing phase can't open other tab!"));
+            }
           }}
         >
           {item.label}

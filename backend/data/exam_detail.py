@@ -21,7 +21,8 @@ class Exam_Detail():
                 data = json.load(file)
 
             questions_config = data['quiz_results']
-            for config in questions_config:
+            for i in range(exam_data.number_question):
+                config = questions_config[i]
                 question = Exam_Question()
                 question.parse_form_json(config)
                 self.questions.append(question)
@@ -44,7 +45,7 @@ class Exam_Detail():
             'questions': questions
         }
     
-    def get_point_by(self, answers):
+    def get_number_correct_answer(self, answers):
         num_correct = 0
         for i in range(len(self.questions)):
             if i < len(answers) and answers[i] != -1:
@@ -52,6 +53,9 @@ class Exam_Detail():
                 question = self.questions[i]
                 if question.check_answer(answer):
                     num_correct += 1
-        return num_correct / len(self.questions) * 10
+        return num_correct
+    
+    def get_point_by(self, answers):
+        return self.get_number_correct_answer(answers) / len(self.questions) * 10
     
             

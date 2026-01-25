@@ -37,39 +37,45 @@ class App:
     def load_examing_info(self):
         if self._app_data.app_state == APP_STATE.EXEMING.value:
 
-            db_examings_data = db.load_objects_from_db("pk", "EXAMING, ", "user_id", self._app_data.current_user)
+            db_examings_data = db.load_objects_from_db(
+                "pk", "EXAMING", "user_id", self._app_data.current_user)
             if len(db_examings_data) == 0:
                 self._app_data.app_state = APP_STATE.IDLE.value
                 self.save_app_data()
                 return
-            
+
             self._examing_data.parse_from_db_object(db_examings_data[0])
             remaining_time = self._examing_data.get_remaining_time()
             if remaining_time <= 0:
                 self.process_finish_exam()
-            
-    def process_finish_exam(self, finish_exam_time = 0):
-        
+
+    def process_finish_exam(self, finish_exam_time=0):
+
         exam_history = None
         exam_detail = self.get_detail_exam(self._examing_data.exam_id)
 
         if exam_detail:
+            number_correct_answers = exam_detail.get_number_correct_answer(
+                self._examing_data.anwsers)
             exam_point = exam_detail.get_point_by(self._examing_data.anwsers)
-            finish_exam_time = max(finish_exam_time, self._examing_data.end_time)
+            finish_exam_time = min(
+                finish_exam_time, self._examing_data.end_time)
             exam_history = Exam_History(
-                id = str(uuid.uuid4()),
-                user_id = self._app_data.current_user,
-                exam_id = self._examing_data.exam_id,
-                start_doing_time = self._examing_data.start_time,
-                exam_doing_time = finish_exam_time - self._examing_data.start_time,
-                exam_answer = self._examing_data.anwsers,
-                exam_point = exam_point
+                id=str(uuid.uuid4()),
+                user_id=self._app_data.current_user,
+                exam_id=self._examing_data.exam_id,
+                start_doing_time=self._examing_data.start_time,
+                exam_doing_time=finish_exam_time - self._examing_data.start_time,
+                exam_answer=self._examing_data.anwsers,
+                exam_point=exam_point,
+                correct_answers=number_correct_answers
             )
             self.add_history(exam_history)
-            
+
             self._app_data.app_state = APP_STATE.IDLE.value
             self.save_app_data()
-            db.remove_objects_from_db("pk", "EXAMING", "user_id", self._app_data.current_user)
+            db.remove_objects_from_db(
+                "pk", "EXAMING", "user_id", self._app_data.current_user)
 
         return exam_history
 
@@ -85,11 +91,11 @@ class App:
             app_data.parse_from_db_object(db_app_data[0])
 
         self._app_data = app_data
-    
+
     def save_app_data(self):
         db_app_data = self._app_data.get_db_object("pk", "APP")
         db.save_object_to_db(db_app_data, "pk")
-        
+
     def load_users(self):
         db_users = db.load_objects_from_db("pk", "USER")
 
@@ -98,7 +104,7 @@ class App:
             user = User_Data()
             user.parse_from_db_object(db_user)
             users.append(user)
-        
+
         self._users = users
 
     def load_docs(self, user_id):
@@ -120,14 +126,15 @@ class App:
         self._exams = exams
 
     def load_exam_histories(self, user_id):
-        db_exam_histories = db.load_objects_from_db("pk", "EXAM_HISTORY", "user_id", user_id)
+        db_exam_histories = db.load_objects_from_db(
+            "pk", "EXAM_HISTORY", "user_id", user_id)
         exam_histories = []
         for db_exam_history in db_exam_histories:
             exam_history = Exam_History()
             exam_history.parse_from_db_object(db_exam_history)
             exam_histories.append(exam_history)
         self._exam_histories = exam_histories
-    
+
     def add_user(self, user):
         assert type(user) == User_Data, "User must be of type User_Data"
         self._users.append(user)
@@ -146,34 +153,30 @@ class App:
         assert exam.user_id == self._app_data.current_user, "Exam must belong to current user"
         self._exams.append(exam)
         db_exam = exam.get_db_object("pk", "EXAM")
-        print('add_exam', db_exam)
         db.save_object_to_db(db_exam, "pk", "id")
 
     def add_history(self, exam_history):
-        assert type(exam_history) == Exam_History, "Exam history must be of type Exam_History"
+        assert type(
+            exam_history) == Exam_History, "Exam history must be of type Exam_History"
         self._exam_histories.append(exam_history)
         db_exam_history = exam_history.get_db_object("pk", "EXAM_HISTORY")
         db.save_object_to_db(db_exam_history, "pk", "id")
 
     def update_examing_data(self, exam_id):
-        print("update_examing_data 1")
         exam = self.get_exam_by(exam_id)
-        print("update_examing_data 2")
         self._examing_data.load_from(exam)
-        print("update_examing_data 3")
         self.save_examing_data()
-        print("update_examing_data 4")
 
     def save_examing_data(self):
         db_object = self._examing_data.get_db_object("pk", "EXAMING")
         db.save_object_to_db(db_object, "pk", "user_id")
-    
+
     def get_doc_by(self, doc_id):
         for doc in self._docs:
             if doc.id == doc_id:
                 return doc
         return None
-    
+
     def get_exam_by(self, exam_id):
         for exam in self._exams:
             if exam.id == exam_id:
@@ -182,21 +185,32 @@ class App:
 
     def remove_doc(self, doc_id):
         doc_to_remove = self.get_doc_by(doc_id)
-        
+
         if doc_to_remove:
             self._docs.remove(doc_to_remove)
             db.remove_objects_from_db("pk", "DOC", "id", doc_id)
             return True
         return False
-    
+
     def remove_exam(self, exam_id):
         exam_to_remove = self.get_exam_by(exam_id)
-        
+
         if exam_to_remove:
             self._exams.remove(exam_to_remove)
             db.remove_objects_from_db("pk", "EXAM", "id", exam_id)
             return True
-        
+
+        return False
+
+    def remove_history_exam_by(self, exam_history_id):
+        exam_history_to_remove = self.get_exam_history_by(exam_history_id)
+
+        if exam_history_to_remove:
+            self._exam_histories.remove(exam_history_to_remove)
+            db.remove_objects_from_db(
+                "pk", "EXAM_HISTORY", "id", exam_history_id)
+            return True
+
         return False
 
     def get_exam_info(self):
@@ -210,19 +224,19 @@ class App:
             if user.id == id:
                 return user
         return User_Data()
-    
+
     def get_users(self):
         return self._users
-    
+
     def get_docs(self):
         return self._docs
-    
+
     def get_exams(self) -> List[Exam_Data]:
         return self._exams
-    
+
     def get_app_data(self):
         return self._app_data
-    
+
     def get_detail_exam(self, exam_id) -> Optional[Exam_Detail]:
         if not exam_id in self._exam_infos:
             exam = self.get_exam_by(exam_id)
@@ -230,9 +244,18 @@ class App:
             exam_detail.load_by(exam)
             self._exam_infos[exam_id] = exam_detail
         return self._exam_infos[exam_id]
-    
+
     def get_examing_data(self):
         return self._examing_data
+
+    def get_exam_histories(self):
+        return self._exam_histories
+
+    def get_exam_history_by(self, exam_history_id):
+        for exam_history in self._exam_histories:
+            if exam_history.id == exam_history_id:
+                return exam_history
+        return None
 
     @staticmethod
     def get_instance():

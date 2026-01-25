@@ -50,8 +50,28 @@ AppUtils.convertUTF8ToNormal = function(str) {
             .replace(/Đ/g, "D");
 }
 
+AppUtils.getCurrentTimeInSecond = function() {
+    return Math.floor(Date.now() / 1000);
+}
+
+AppUtils.getCurrentTimeInMili = function() {
+    return Date.now();
+}
+
 AppUtils.convertMiliInToMinutes = function(milisecond) {
     return Math.floor(milisecond / 60 / 1000);
+}
+
+AppUtils.convertMiliToTimeString = function(milisecond) {
+    if (milisecond <= 0) milisecond = 0;
+    const hours = Math.floor(milisecond / 60 / 60 / 1000);
+    const minutes = Math.floor(milisecond / 60 / 1000);
+    const seconds = Math.floor((milisecond / 1000) % 60);
+    if (hours > 0) {
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    }
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
 }
 
 AppUtils.getValuenInRangeWith = function(min, max, percent, step) {
@@ -67,6 +87,10 @@ AppUtils.clipText = function(text, maxLength) {
         return text.substring(0, maxLength) + "...";
     }
     return text;
+}
+
+AppUtils.getFloatPoint = function(point) {
+    return Math.round(point * 100) / 100;
 }
 
 export default AppUtils;

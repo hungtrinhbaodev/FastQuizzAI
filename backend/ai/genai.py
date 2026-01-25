@@ -66,7 +66,7 @@ def generate_quiz_from_docs(file_paths, categories, num_questions = 5, save_name
             Categories: {", ".join(categories)}.
 
             TASK:
-            1. Generate exactly {num_questions} questions based strictly on the uploaded content.
+            1. You must generate EXACTLY {num_questions} questions. 
             2. The 'question_text' and 'options' must be in the same language as the document.
             3. The 'explanation_vi' must be in Vietnamese (Tiếng Việt).
             4. Each question must have exactly 4 distinct options.

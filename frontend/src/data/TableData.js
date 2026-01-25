@@ -1,30 +1,27 @@
 class TableData {
+  constructor() {
+    // number row and cols
+    this.numRows = 0;
+    this.numCols = 0;
 
-    constructor() {
+    // header of columns
+    this.headers = [];
 
-        // number row and cols
-        this.numRows = 0;
-        this.numCols = 0;
+    // type of data per row
+    this.dataTypes = [];
 
-        // header of columns
-        this.headers = [];
+    // 2D array content data
+    this.rowsData = [];
 
-        // type of data per row
-        this.dataTypes = [];
+    // width config percent width of cell on row
+    this.widths = [];
 
-        // 2D array content data 
-        this.rowsData = [];
+    // min height for table that dose not have any content
+    this.minHeight = 0;
 
-        // width config percent width of cell on row 
-        this.widths = [];
-
-        // min height for table that dose not have any content
-        this.minHeight = 0;
-
-        // src that make this table data can get to use when need
-        this.srcData = null;
-    }
-
+    // src that make this table data can get to use when need
+    this.srcData = null;
+  }
 }
 
 export default TableData;

@@ -17,6 +17,7 @@ class Examing_Data(Base_Data):
         self.state = EXAM_STATE.NOT_DOING.value
 
     def load_from(self, exam):
+        print('load_from_exam', exam.user_id, exam.id)
         self.user_id = exam.user_id
         self.exam_id = exam.id
         self.anwsers = []
@@ -25,7 +26,6 @@ class Examing_Data(Base_Data):
         self.state = EXAM_STATE.EXAMING.value
         self.start_time = utils.get_currrent_millisecond()
         self.end_time = utils.get_currrent_millisecond() + exam.exam_duration
-
     def get_remaining_time(self):
         return self.end_time - utils.get_currrent_millisecond()
 

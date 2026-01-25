@@ -1,190 +1,181 @@
 const AppConst = {
+  TYPE_SEND: {
+    GET: 0,
 
-    TYPE_SEND: {
+    POST: 1,
 
-        GET: 0,
+    PUT: 2,
 
-        POST: 1,
+    DELETE: 3
+  },
 
-        PUT: 2,
+  // The base URL for the backend server, for accessing static files like images
+  SERVER_BASE_URL: 'http://127.0.0.1:8000',
 
-        DELETE: 3,
-    },
+  // The full URL for the API endpoints
+  SERVER_API_URL: 'http://127.0.0.1:8000/api',
 
-    // The base URL for the backend server, for accessing static files like images
-    SERVER_BASE_URL: "http://127.0.0.1:8000",
+  ROUTER: {
+    LOGIN: '/login-api',
 
-    // The full URL for the API endpoints
-    SERVER_API_URL: "http://127.0.0.1:8000/api",
+    CREATE_ACCOUNT: '/create-account-api',
 
-    ROUTER: {
+    GET_DOCUMENTS: '/get-documents-api',
 
-        LOGIN: "/login-api",
+    ADD_DOCUMENT: '/add-document-api',
 
-        CREATE_ACCOUNT: "/create-account-api",
+    REMOVE_DOCUMENT: '/remove-document-api',
 
-        GET_DOCUMENTS: "/get-documents-api",
+    GET_EXAMS: '/get-exams-api',
 
-        ADD_DOCUMENT: "/add-document-api",
+    CREATE_EXAM: '/create-exam-api',
 
-        REMOVE_DOCUMENT: "/remove-document-api",
+    REMOVE_EXAM: '/remove-exam-api',
 
-        GET_EXAMS: "/get-exams-api",
+    DO_EXAM: '/do-exam-api',
 
-        CREATE_EXAM: "/create-exam-api",
+    CHOSEN_ANSWER: '/chosen-anwser-api',
 
-        REMOVE_EXAM: "/remove-exam-api",
+    SUBMIT_EXAM: '/submit-exam-api',
 
-        DO_EXAM: "/do-exam-api",
+    GET_HISRORIES: '/get-exam-histories-api',
 
-        CHOSEN_ANSWER: "/chosen-anwser-api",
+    GET_HISTORY_DETAIL: '/get-history-detail-api',
 
-        TEST_QUESTION_EXAM: "/test-question-api",
-    },
+    REMOVE_EXAM_HISTORY: '/remove-exam-history-api',
 
-    APP_STATE: {
+    TEST_QUESTION_EXAM: '/test-question-api',
 
-        NO_LOGIN: 0, 
+    SHUTDOWN_SERVER: '/shutdown-api',
 
-        IDLE: 1,
+    PING_SERVER: '/ping-api'
+  },
 
-        EXEMING: 2
+  APP_STATE: {
+    NO_LOGIN: 0,
 
-    },
+    IDLE: 1,
 
-    DIALOG_USAGE: {
+    EXEMING: 2
+  },
 
-        TEST: -2,
+  DIALOG_USAGE: {
+    TEST: -2,
 
-        NONE: -1,
+    NONE: -1,
 
-        CREATE_ACCOUNT: 0,
+    CREATE_ACCOUNT: 0,
 
-        ADD_DOCUMENT: 2,
+    ADD_DOCUMENT: 2,
 
-        VIEW_DOCUMENT: 3,
+    VIEW_DOCUMENT: 3,
 
-        CONFIRM_NOTIFY: 4,
+    CONFIRM_NOTIFY: 4,
 
-        ADD_EXAM: 5,
+    ADD_EXAM: 5,
 
-    },
+    VIEW_HISTORY_DETAIL: 6
+  },
 
-    LOADING_USAGE: {
+  LOADING_USAGE: {
+    NONE: -1,
 
-        NONE: -1,
-        
-        LOADING: 0
+    LOADING: 0
+  },
 
-    },
+  CREATE_ACCOUNT_STEP: {
+    INPUT_NAME: 1,
 
-    CREATE_ACCOUNT_STEP: {
-        
-        INPUT_NAME: 1,
+    INPUT_AVATAR: 2
+  },
 
-        INPUT_AVATAR: 2,
+  TABLE_CONTENT_TYPE: {
+    TEXT: 0,
 
-    },
+    ICON: 1,
 
-    TABLE_CONTENT_TYPE: {
+    MULIT_TEXT: 2
+  },
 
-        TEXT: 0,
+  ICON_TYPE: {
+    WATCH: 0,
 
-        ICON: 1,
+    MAKE_EXAM: 1,
 
-        MULIT_TEXT: 2
+    ADD: 2,
 
-    },
+    DELETE: 3,
 
-    ICON_TYPE: {
-        
-        WATCH: 0,
+    ADD_FOLDER: 4,
 
-        MAKE_EXAM: 1,
+    EMPTY_BOX: 5,
 
-        ADD: 2,
+    CHECK_BOX: 6
+  },
 
-        DELETE: 3,
+  DEV_MODE: true,
 
-        ADD_FOLDER: 4,
+  DOCUMENT_TAG: {
+    LAW: 0,
 
-        EMPTY_BOX: 5,
+    ENGLISH: 1,
 
-        CHECK_BOX: 6
+    OTHER: 2
+  },
 
-    },
+  SUBSCRIBE_TYPE: {
+    RELOAD_USER_DATA: 0,
 
-    DEV_MODE: true,
+    RELOAD_USER_DOCUMMENTS: 1,
 
-    DOCUMENT_TAG: {
+    RELOAD_USER_EXAMS: 2,
 
-        LAW: 0,
+    RELOAD_USER_EXAMING_DATA: 3,
 
-        ENGLISH: 1,
+    RELOAD_USER_EXAM_HISTORY: 4
+  },
 
-        OTHER: 2
-    },
+  SLIDER_STATE: {
+    IDLE: 0,
 
-    SUBSCRIBE_TYPE: {
-        
-        RELOAD_USER_DATA: 0,
+    SLIDING: 1,
 
-        RELOAD_USER_DOCUMMENTS: 1,
+    MOVE_BACK: 2
+  },
 
-        RELOAD_USER_EXAMS: 2,
+  EXAM_DIFFICULT: {
+    EASY: 0,
 
-        RELOAD_USER_EXAMING_DATA: 3,
-    },
+    MEDIUM: 1,
 
-    SLIDER_STATE: {
+    HARD: 2
+  },
 
-        IDLE: 0,
+  EXAM_TIME: {
+    START: 30 * 60 * 1000, // 30 minutes in milisecond
 
-        SLIDING: 1,
+    END: 120 * 60 * 1000, // 120 minutes in milisecond
 
-        MOVE_BACK: 2
-    },
+    STEP: 5 * 60 * 1000 // step per slide is 5 minutes
+  },
 
-    EXAM_DIFFICULT: {
+  EXAM_NUMBER_QUESTION: {
+    START: 30,
 
-        EASY: 0,
+    END: 120,
 
-        MEDIUM: 1,
+    STEP: 10
+  },
 
-        HARD: 2
-    },
+  EXAM_DETAIL_MODE: {
+    FULL: 0,
 
-    EXAM_TIME: {
+    DOING: 1
+  },
 
-        START: (30 * 60 * 1000), // 30 minutes in milisecond
+  MAX_DOC_IN_EXAM: 5,
 
-        END: (120 * 60 * 1000), // 120 minutes in milisecond
-
-        STEP: (5 * 60 * 1000) // step per slide is 5 minutes
-    },
-
-    EXAM_NUMBER_QUESTION: {
-
-        START: 30,
-
-        END: 120,
-
-        STEP: 10,
-
-    },
-
-    EXAM_DETAIL_MODE: {
-
-        FULL: 0,
-
-        DOING: 1
-
-    },
-
-    MAX_DOC_IN_EXAM: 5,
-
-    MAX_DOC_SHOW_IN_EXAM: 3,
-
-}
+  MAX_DOC_SHOW_IN_EXAM: 3
+};
 
 export default AppConst;

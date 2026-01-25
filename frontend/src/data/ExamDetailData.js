@@ -21,6 +21,13 @@ class ExamDetailData {
         this.questions.push(questionData);
     }
 
+    getCorrectAnswerAt(questionIndex) {
+        const questionData = this.questions[questionIndex];
+        if (!questionData) return -1;
+        const correctAnswer = questionData.correctAnswer;
+        return questionData.options.indexOf(correctAnswer);
+    }
+
 }
 
 export default ExamDetailData;

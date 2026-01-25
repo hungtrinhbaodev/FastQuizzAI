@@ -6,3 +6,27 @@
     padding: 10px;
 }
 
+.examing-page-time-countdown-container {
+    position: fixed;
+    top: 80px; /* Distance from bottom of screen */
+    right: 20px;  /* Distance from right of screen */
+    z-index: 1000; /* Ensures it stays on top of other elements */
+    font-size: 30px;
+    color: whitesmoke;
+    font-weight: bold;
+    display: flex;
+    background-color: var(--primary-color);
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.examing-page-button-group-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.examing-page-title {
+    color: var(--primary-color);
+}

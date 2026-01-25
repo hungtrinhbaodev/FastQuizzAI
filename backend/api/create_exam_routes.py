@@ -7,17 +7,20 @@ import os
 from const import DOCUMENTS_FOLDER, EXAM_FOLDER, DOCUMENT_TAG
 import json
 
+
 def get_document_path(doc_url):
     return os.path.join(DOCUMENTS_FOLDER, os.path.basename(doc_url))
 
+
 create_exam_bp = Blueprint('create_exam_api', __name__)
+
 
 @create_exam_bp.route('/create-exam-api', methods=['POST'])
 def create_exam():
 
     if 'user_id' not in request.form:
         return jsonify({'error': 'Not found user id to create exam!'}), 400
-    
+
     app = App.get_instance()
     app_data = app.get_app_data()
     user_id = request.form['user_id']
@@ -26,7 +29,7 @@ def create_exam():
         return jsonify({
             'error': f"'{user_id}' is not login!"
         }), 400
-    
+
     exam_data = Exam_Data()
     exam_data.id = str(uuid.uuid4())
     exam_data.user_id = request.form['user_id']
@@ -62,6 +65,7 @@ def create_exam():
         "exam_data": exam_data.get_dict()
     }), 201
 
+
 @create_exam_bp.route('/remove-exam-api', methods=['POST'])
 def remove_exam():
 
@@ -69,7 +73,7 @@ def remove_exam():
 
     if 'user_id' not in request.form or 'exam_id' not in request.form:
         return jsonify({'error': 'Not found user id to remove exam!'}), 400
-    
+
     if 'exam_id' not in request.form:
         return jsonify({'error': 'Not found exam id to remove exam!'}), 400
 
@@ -79,7 +83,7 @@ def remove_exam():
 
     if exam is None:
         return jsonify({'error': 'Not found exam!'}), 400
-    
+
     user_id = request.form['user_id']
 
     if exam.user_id != user_id:
@@ -92,10 +96,9 @@ def remove_exam():
             os.remove(exam.exam_path)
     except Exception as e:
         print(f"Error removing file: {e}")
-    
+
     app.remove_exam(exam_id)
 
     return jsonify({
         "message": "remove exam success!"
     }), 201
-

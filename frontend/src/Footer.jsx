@@ -10,14 +10,14 @@ const Footer = () => {
       <div className="socials">
         <span>Facebook</span> | <span>GitHub</span>
       </div>
-      {AppConst.DEV_MODE && (
+      {/* {AppConst.DEV_MODE && (
         <button
           className='footer-button-test-api'
           onClick={() => {appService.onTestAPI()}}
         >
-          TEST IAP
+          TEST API
         </button>
-      )}
+      )} */}
     </footer>
   );
 };
