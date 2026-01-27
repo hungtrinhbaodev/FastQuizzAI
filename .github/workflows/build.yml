@@ -1,9 +1,10 @@
-name: Build macOS Universal2 (Manual Fusion)
+name: Build macOS Universal2
 on: [push, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-14 # The only available Silicon runner
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -11,31 +12,34 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
+          # Use Python.org's version which is natively universal2
           python-version: '3.11'
 
-      - name: Install PyInstaller & Base Tools
-        run: pip install pyinstaller flask flask-cors google-genai
-
-      - name: Force Universal Binaries for Problematic Libs
+      - name: Force Install Universal2 Dependencies
         run: |
-          # We manually download the 'fat' wheels if they exist, 
-          # or tell PyInstaller to ignore the strict validation.
-          # For markupsafe and cffi, we force-install the universal2 versions
-          pip uninstall -y markupsafe cffi
-          pip install --only-binary=:all: --platform macos_12_0_universal2 markupsafe cffi || \
-          pip install markupsafe cffi
+          python -m pip install --upgrade pip
+
+          # Create a temp directory for universal wheels
+          mkdir universal_wheels
+
+          # Force download universal2 versions of libraries that usually cause errors
+          # macos_12_0_universal2 is a safe target for current runners
+          pip download \
+            --only-binary=:all: \
+            --platform macos_12_0_universal2 \
+            --dest universal_wheels \
+            markupsafe cffi flask flask-cors google-genai pyinstaller
+
+          # Install the wheels we just downloaded
+          pip install universal_wheels/*.whl
 
       - name: Run Python Build Script
         run: |
           cd backend
-          # We remove the --target-arch flag to let PyInstaller 
-          # build for the current machine (ARM64) but since it's an M1, 
-          # it will run on M1s. For your Intel Mac, we will build a 
-          # separate version or use Rosetta.
-          python build_script.py
+          python build_script.py # Ensure target-arch is 'universal2' in your script
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: backend-mac-build
+          name: backend-universal-mac
           path: release/
