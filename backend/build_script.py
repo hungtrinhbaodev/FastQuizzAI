@@ -27,7 +27,7 @@ build_command = [
 result = subprocess.run(build_command)
 
 COPIES_FILES = [
-    "./assets/config.json"
+    # "./assets/config.json"
 ]
 
 print("COPYING RESOURCES...")
