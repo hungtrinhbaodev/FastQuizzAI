@@ -1,0 +1,39 @@
+name: Build macOS ARM64
+
+on:
+  push:
+    branches:
+      - main # Or whatever your branch name is (e.g., master)
+  workflow_dispatch: # This allows you to run it manually from the UI
+
+jobs:
+  build:
+    runs-on: macos-14 # This is the native M1 (Silicon) runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flask flask-cors google-genai pyinstaller markupsafe
+
+      - name: Run your Build Script
+        # This replaces the raw PyInstaller command with your python file
+        # Assuming your script is named 'build_script.py' inside 'backend' folder
+        run: |
+          cd backend
+          python build_script.py
+
+      - name: Upload Release Folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-arm64-package
+          # This uploads the entire 'release' folder including config.json
+          path: release/
