@@ -7,8 +7,6 @@ get_documents_bp = Blueprint('get-documents-api', __name__)
 @get_documents_bp.route('/get-documents-api', methods=['POST'])
 def get_documents():
 
-    print("request", request.form)
-
     if 'user_id' not in request.form:
         return jsonify({'error': 'Not found user id to get docs!'}), 400
 

@@ -69,8 +69,6 @@ def create_exam():
 @create_exam_bp.route('/remove-exam-api', methods=['POST'])
 def remove_exam():
 
-    print("Go here 1")
-
     if 'user_id' not in request.form or 'exam_id' not in request.form:
         return jsonify({'error': 'Not found user id to remove exam!'}), 400
 

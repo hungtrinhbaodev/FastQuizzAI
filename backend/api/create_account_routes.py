@@ -3,12 +3,12 @@ import uuid
 from app import App
 from data.user_data import User_Data
 from flask import Blueprint, jsonify, request, send_from_directory
-from const import APP_STATE
+from const import APP_STATE, DEFAUL_PATH_PROJECT
 
 create_account_bp = Blueprint('create_account_api', __name__)
 
 # --- Database Helper Functions (using a simple JSON file) ---
-AVATAR_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets', 'avatars')
+AVATAR_FOLDER = os.path.join(DEFAUL_PATH_PROJECT, 'assets', 'avatars')
 
 # --- API Endpoints ---
 @create_account_bp.route('/create-account-api', methods=['POST'])

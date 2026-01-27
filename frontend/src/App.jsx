@@ -73,9 +73,12 @@ function App() {
       }
     });
 
+    let count = 0;
     const intervalPing = setInterval(() => {
       appService.sendPing();
-    }, 3000);
+      console.log('Go ping!', count);
+      count++;
+    }, 2000);
 
     return () => {
       clearInterval(intervalPing);

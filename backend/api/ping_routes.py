@@ -7,14 +7,11 @@ import signal
 last_ping = time.time()
 
 
-def manage_ping(subs_process=[]):
+def manage_ping():
     global last_ping
     while True:
-        time.sleep(2)
-        if time.time() - last_ping > 5:
-            for sub_process in subs_process:
-                print("ERROR go here erase processs", sub_process)
-                sub_process.terminate()
+        time.sleep(1)
+        if time.time() - last_ping > 10:
             os.kill(os.getpid(), signal.SIGINT)
 
 

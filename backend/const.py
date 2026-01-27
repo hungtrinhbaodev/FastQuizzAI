@@ -1,6 +1,7 @@
 from enum import Enum
 import os
 import json
+import sys
 
 
 class APP_STATE(Enum):
@@ -36,12 +37,16 @@ class EXAM_STATE(Enum):
     EXAMING = 1
 
 
+DEFAUL_PATH_PROJECT = ""
+
+DEFAUL_PATH_PROJECT = os.getcwd()
+
 DOCUMENTS_FOLDER = os.path.join(
-    os.getcwd(), 'assets', 'documents')
+    DEFAUL_PATH_PROJECT, 'assets', 'documents')
 
-EXAM_FOLDER = os.path.join(os.getcwd(), 'assets', 'exams')
+EXAM_FOLDER = os.path.join(DEFAUL_PATH_PROJECT, 'assets', 'exams')
 
-CONFIG_PATH = os.path.join(os.getcwd(), 'assets', 'config.json')
+CONFIG_PATH = os.path.join(DEFAUL_PATH_PROJECT, 'assets', 'config.json')
 
 with open(CONFIG_PATH, 'r', encoding='utf-8') as file:
     # Use json.load to parse the file object
