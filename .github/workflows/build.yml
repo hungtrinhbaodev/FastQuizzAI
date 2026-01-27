@@ -22,9 +22,13 @@ jobs:
       - name: Install Universal Dependencies
         run: |
           python -m pip install --upgrade pip
-          # We force pip to install the universal2 versions of libraries
-          # This ensures markupsafe and others have both Intel and ARM slices
-          python -m pip install --upgrade --only-binary=:all: flask flask-cors google-genai pyinstaller markupsafe
+          # We use --platform macos_12_0_universal2 to force the 'fat' binaries
+          # and --only-binary=:all: to prevent it from building a 'thin' one from source
+          pip install \
+            --platform macos_12_0_universal2 \
+            --only-binary=:all: \
+            --upgrade \
+            flask flask-cors google-genai pyinstaller markupsafe
 
       - name: Run Python Build Script
         run: |
