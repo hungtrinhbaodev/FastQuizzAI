@@ -15,11 +15,10 @@ print("BUILD BACKEND...")
 build_command = [
     sys.executable, "-m", "PyInstaller",
     "--onefile",
-    "--noconsole",
     "--distpath", PATH_RELEASE,
-    "--target-arch", "arm64",         # Forces M1/M2 native build
-    "--collect-all", "google.genai",  # Fixes the Google SDK hidden files
-    "--collect-all", "markupsafe",    # Fixes the markupsafe error we saw
+    "--target-arch", "universal2",  # <--- Change this line
+    "--collect-all", "google.genai",
+    "--collect-all", "markupsafe",
     "main.py"
 ]
 
