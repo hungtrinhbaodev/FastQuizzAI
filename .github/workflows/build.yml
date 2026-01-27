@@ -1,14 +1,14 @@
-name: Build macOS ARM64
+name: Build macOS Universal2
 
 on:
   push:
     branches:
-      - main # Or whatever your branch name is (e.g., master)
-  workflow_dispatch: # This allows you to run it manually from the UI
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: macos-14 # This is the native M1 (Silicon) runner
+    runs-on: macos-14
 
     steps:
       - name: Checkout code
@@ -17,23 +17,22 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.13'
 
-      - name: Install dependencies
+      - name: Install Universal Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flask flask-cors google-genai pyinstaller markupsafe
+          # We force pip to install the universal2 versions of libraries
+          # This ensures markupsafe and others have both Intel and ARM slices
+          python -m pip install --upgrade --only-binary=:all: flask flask-cors google-genai pyinstaller markupsafe
 
-      - name: Run your Build Script
-        # This replaces the raw PyInstaller command with your python file
-        # Assuming your script is named 'build_script.py' inside 'backend' folder
+      - name: Run Python Build Script
         run: |
           cd backend
           python build_script.py
 
-      - name: Upload Release Folder
+      - name: Upload Universal Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: backend-arm64-package
-          # This uploads the entire 'release' folder including config.json
+          name: backend-universal-mac
           path: release/
