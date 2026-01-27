@@ -22,12 +22,11 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          # Clean install to ensure no "thin" cached versions are used
-          pip uninstall -y markupsafe
+          # We force pip to prefer binary wheels. 
+          # Most modern libraries (like markupsafe) provide universal2 wheels by default 
+          # on PyPI for Python 3.13 macOS.
           pip install --upgrade flask flask-cors google-genai pyinstaller
-          # Installing markupsafe without specifying platform usually 
-          # pulls the universal2 wheel on macOS runners automatically
-          pip install markupsafe
+          pip install --upgrade --only-binary=:all: markupsafe
 
       - name: Run Python Build Script
         run: |
