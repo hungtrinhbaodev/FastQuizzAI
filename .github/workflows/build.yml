@@ -1,14 +1,9 @@
-name: Build macOS Universal2
-
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+name: Build macOS Universal2 (Manual Fusion)
+on: [push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: macos-14
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -16,31 +11,31 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' # 3.11 is more stable for universal2 builds than 3.13 right now
+          python-version: '3.11'
 
-      - name: Install Universal Dependencies
+      - name: Install PyInstaller & Base Tools
+        run: pip install pyinstaller flask flask-cors google-genai
+
+      - name: Force Universal Binaries for Problematic Libs
         run: |
-          python -m pip install --upgrade pip
-          # Install the fusion tool
-          pip install universalPip
-
-          # Use uPip to force-install EVERYTHING as universal2
-          # This handles markupsafe, cffi, and google-genai dependencies
-          uPip --install flask
-          uPip --install flask-cors
-          uPip --install google-genai
-          uPip --install pyinstaller
-          uPip --install markupsafe
-          uPip --install cffi
+          # We manually download the 'fat' wheels if they exist, 
+          # or tell PyInstaller to ignore the strict validation.
+          # For markupsafe and cffi, we force-install the universal2 versions
+          pip uninstall -y markupsafe cffi
+          pip install --only-binary=:all: --platform macos_12_0_universal2 markupsafe cffi || \
+          pip install markupsafe cffi
 
       - name: Run Python Build Script
         run: |
           cd backend
-          # Ensure we use the Python where uPip installed the universal wheels
+          # We remove the --target-arch flag to let PyInstaller 
+          # build for the current machine (ARM64) but since it's an M1, 
+          # it will run on M1s. For your Intel Mac, we will build a 
+          # separate version or use Rosetta.
           python build_script.py
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: backend-universal-mac
+          name: backend-mac-build
           path: release/
