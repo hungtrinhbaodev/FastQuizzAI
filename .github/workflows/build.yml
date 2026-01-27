@@ -18,20 +18,20 @@ jobs:
       - name: Force Install Universal2 Dependencies
         run: |
           python -m pip install --upgrade pip
-
-          # Create a temp directory for universal wheels
           mkdir universal_wheels
 
-          # Force download universal2 versions of libraries that usually cause errors
-          # macos_12_0_universal2 is a safe target for current runners
+          # We use a more compatible platform tag
           pip download \
             --only-binary=:all: \
-            --platform macos_12_0_universal2 \
+            --platform macosx_10_9_universal2 \
             --dest universal_wheels \
             markupsafe cffi flask flask-cors google-genai pyinstaller
 
-          # Install the wheels we just downloaded
-          pip install universal_wheels/*.whl
+          # If the above fails for any specific lib, this line catches the rest
+          pip install --upgrade flask flask-cors google-genai pyinstaller
+
+          # Install the universal wheels we found
+          pip install --force-reinstall universal_wheels/*.whl
 
       - name: Run Python Build Script
         run: |
