@@ -19,16 +19,15 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Install Universal Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          # We use --platform macos_12_0_universal2 to force the 'fat' binaries
-          # and --only-binary=:all: to prevent it from building a 'thin' one from source
-          pip install \
-            --platform macos_12_0_universal2 \
-            --only-binary=:all: \
-            --upgrade \
-            flask flask-cors google-genai pyinstaller markupsafe
+          # Clean install to ensure no "thin" cached versions are used
+          pip uninstall -y markupsafe
+          pip install --upgrade flask flask-cors google-genai pyinstaller
+          # Installing markupsafe without specifying platform usually 
+          # pulls the universal2 wheel on macOS runners automatically
+          pip install markupsafe
 
       - name: Run Python Build Script
         run: |
