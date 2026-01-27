@@ -2,8 +2,7 @@ name: Build macOS Universal2
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -17,23 +16,30 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.11' # 3.11 is more stable for universal2 builds than 3.13 right now
 
-      - name: Install Dependencies
+      - name: Install Universal Dependencies
         run: |
           python -m pip install --upgrade pip
-          # We force 'only-binary' because building from source on an M1 
-          # will almost always create a 'thin' ARM64 binary.
-          # We want the pre-built 'Fat' (universal2) wheels from PyPI.
-          pip install --upgrade --only-binary=:all: \
-            flask flask-cors google-genai pyinstaller markupsafe jinja2
+          # Install the fusion tool
+          pip install universalPip
+
+          # Use uPip to force-install EVERYTHING as universal2
+          # This handles markupsafe, cffi, and google-genai dependencies
+          uPip --install flask
+          uPip --install flask-cors
+          uPip --install google-genai
+          uPip --install pyinstaller
+          uPip --install markupsafe
+          uPip --install cffi
 
       - name: Run Python Build Script
         run: |
           cd backend
+          # Ensure we use the Python where uPip installed the universal wheels
           python build_script.py
 
-      - name: Upload Universal Artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: backend-universal-mac
