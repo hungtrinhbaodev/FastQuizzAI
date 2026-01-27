@@ -15,8 +15,10 @@ print("BUILD BACKEND...")
 build_command = [
     sys.executable, "-m", "PyInstaller",
     "--onefile",
+    "--noconsole",
+    "--clean", # Added to force a fresh analysis
     "--distpath", PATH_RELEASE,
-    "--target-arch", "universal2",  # <--- Change this line
+    "--target-arch", "universal2",
     "--collect-all", "google.genai",
     "--collect-all", "markupsafe",
     "main.py"

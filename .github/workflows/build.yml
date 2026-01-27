@@ -22,11 +22,17 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          # We force pip to prefer binary wheels. 
-          # Most modern libraries (like markupsafe) provide universal2 wheels by default 
-          # on PyPI for Python 3.13 macOS.
-          pip install --upgrade flask flask-cors google-genai pyinstaller
-          pip install --upgrade --only-binary=:all: markupsafe
+          # 1. Uninstall the runner's default 'thin' version
+          pip uninstall -y markupsafe
+
+          # 2. Install universal2 versions specifically
+          # This tells pip to ignore the runner's architecture and get the universal wheel
+          pip install --upgrade \
+            --only-binary=:all: \
+            flask flask-cors google-genai pyinstaller
+            
+          # Force download of the universal2 wheel for markupsafe
+          pip install markupsafe --only-binary=:all:
 
       - name: Run Python Build Script
         run: |
