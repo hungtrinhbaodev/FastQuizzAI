@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import BoxExamQuestion from './BoxExamQuestion';
 import './ExamHistoryDetail.css';
 
-const ExamHistoryDetail = ({ historyData, examDetail }) => {
+const ExamHistoryDetail = ({ historyData, examDetail, closeDialog }) => {
   useEffect(() => {
     console.log('ExamHistoryDetail', historyData.shuffleAnswers.length);
   }, []);
@@ -28,7 +28,14 @@ const ExamHistoryDetail = ({ historyData, examDetail }) => {
         ))}
       </div>
       <div className="exam-history_detail-group-button">
-        <button className="exam-history-button-confirm">Confirm</button>
+        <button
+          className="exam-history-button-confirm"
+          onClick={() => {
+            closeDialog();
+          }}
+        >
+          Confirm
+        </button>
       </div>
     </div>
   );

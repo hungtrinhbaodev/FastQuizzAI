@@ -209,6 +209,7 @@ function App() {
             <ExamHistoryDetail
               historyData={dialogData.extraData.historyData}
               examDetail={dialogData.extraData.examDetailData}
+              closeDialog={closeDialog}
             />
           )}
       </Dialog>
