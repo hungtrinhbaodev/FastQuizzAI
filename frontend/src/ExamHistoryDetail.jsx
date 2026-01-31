@@ -3,6 +3,10 @@ import BoxExamQuestion from './BoxExamQuestion';
 import './ExamHistoryDetail.css';
 
 const ExamHistoryDetail = ({ historyData, examDetail }) => {
+  useEffect(() => {
+    console.log('ExamHistoryDetail', historyData.shuffleAnswers.length);
+  }, []);
+
   return (
     <div className="exam-history-detail-container">
       <h2 className="exam-history-detail-title">Exam result:</h2>
@@ -12,10 +16,14 @@ const ExamHistoryDetail = ({ historyData, examDetail }) => {
             key={index}
             questionData={questionData}
             questionMode={examDetail.examMode}
-            correctIndex={examDetail.getCorrectAnswerAt(index)}
+            correctIndex={examDetail.getCorrectAnswerAt(
+              index,
+              historyData.shuffleAnswers[index]
+            )}
             chosenIndex={historyData.examAnswer[index]}
             questionIndex={index}
             onChoseOption={() => {}}
+            shuffleAnswer={historyData.shuffleAnswers[index]}
           />
         ))}
       </div>

@@ -1,4 +1,5 @@
 from data.base_data import Base_Data
+import utils
 
 
 class Exam_History(Base_Data):
@@ -11,7 +12,8 @@ class Exam_History(Base_Data):
             start_doing_time=0,
             exam_answer=[],
             exam_point=0,
-            correct_answers=0
+            correct_answers=0,
+            shuffle_anwsers=[]
     ):
         super().__init__()
         self.id = id
@@ -22,3 +24,13 @@ class Exam_History(Base_Data):
         self.exam_answers = exam_answer
         self.exam_point = exam_point
         self.correct_answers = correct_answers
+        self.shuffle_answers = shuffle_anwsers
+
+    def update_default_added_key(self):
+        is_update = False
+        if len(self.shuffle_answers) == 0 or len(self.exam_answers) != len(self.shuffle_answers):
+            self.shuffle_answers = []
+            for _ in range(len(self.exam_answers)):
+                self.shuffle_answers.append(utils.make_list_indices(4))
+            is_update = True
+        return is_update

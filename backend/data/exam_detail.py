@@ -3,6 +3,7 @@ import json
 from const import VIEW_EXAM_DETAIL_MODE
 from typing import List
 
+
 class Exam_Detail():
 
     def __init__(self):
@@ -13,7 +14,7 @@ class Exam_Detail():
 
         if exam_data is None:
             return
-        
+
         file_path = exam_data.exam_path
 
         try:
@@ -34,7 +35,7 @@ class Exam_Detail():
     def get_questions(self) -> List[Exam_Question]:
         return self.questions
 
-    def get_dict(self, detail_mode = VIEW_EXAM_DETAIL_MODE.FULL.value):
+    def get_dict(self, detail_mode=VIEW_EXAM_DETAIL_MODE.FULL.value):
 
         questions = []
         for question in self.questions:
@@ -44,18 +45,16 @@ class Exam_Detail():
             'detail_mode': detail_mode,
             'questions': questions
         }
-    
-    def get_number_correct_answer(self, answers):
+
+    def get_number_correct_answer(self, answers, shuffle_answers=[]):
         num_correct = 0
         for i in range(len(self.questions)):
             if i < len(answers) and answers[i] != -1:
                 answer = answers[i]
                 question = self.questions[i]
-                if question.check_answer(answer):
+                if question.check_answer(shuffle_answers[i][answer]):
                     num_correct += 1
         return num_correct
-    
-    def get_point_by(self, answers):
-        return self.get_number_correct_answer(answers) / len(self.questions) * 10
-    
-            
+
+    def get_point_by(self, answers, shuffle_answers=[]):
+        return self.get_number_correct_answer(answers, shuffle_answers) / len(self.questions) * 10

@@ -56,8 +56,11 @@ class App:
 
         if exam_detail:
             number_correct_answers = exam_detail.get_number_correct_answer(
-                self._examing_data.anwsers)
-            exam_point = exam_detail.get_point_by(self._examing_data.anwsers)
+                self._examing_data.anwsers,
+                self._examing_data.shuffle_answers
+            )
+            exam_point = exam_detail.get_point_by(
+                self._examing_data.anwsers, self._examing_data.shuffle_answers)
             finish_exam_time = min(
                 finish_exam_time, self._examing_data.end_time)
             exam_history = Exam_History(
@@ -68,7 +71,8 @@ class App:
                 exam_doing_time=finish_exam_time - self._examing_data.start_time,
                 exam_answer=self._examing_data.anwsers,
                 exam_point=exam_point,
-                correct_answers=number_correct_answers
+                correct_answers=number_correct_answers,
+                shuffle_anwsers=self._examing_data.shuffle_answers
             )
             self.add_history(exam_history)
 
@@ -131,7 +135,10 @@ class App:
         exam_histories = []
         for db_exam_history in db_exam_histories:
             exam_history = Exam_History()
-            exam_history.parse_from_db_object(db_exam_history)
+            is_update_key = exam_history.parse_from_db_object(db_exam_history)
+            if is_update_key:
+                db.save_object_to_db(
+                    exam_history.get_db_object("pk", "EXAM_HISTORY"), "pk", "id")
             exam_histories.append(exam_history)
         self._exam_histories = exam_histories
 

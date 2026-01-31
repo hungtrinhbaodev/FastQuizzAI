@@ -9,7 +9,8 @@ const BoxExamQuestion = ({
   correctIndex,
   onChoseOption,
   questionIndex,
-  chosenIndex
+  chosenIndex,
+  shuffleAnswer
 }) => {
   const [chosenAnswerIndex, setChosenAnswerIndex] = useState(-1);
 
@@ -61,36 +62,43 @@ const BoxExamQuestion = ({
       <label className="box-exam-question-label-content box-exam-question-label">
         {questionIndex + 1}. {questionData.questionText}
       </label>
-      {questionData.options.map((sampleAnswer, index) => (
-        <div key={index} className="box-exam-question-sample-answer-container">
+      {questionData.options.map((_, index) => {
+        const shuffleIndex = shuffleAnswer[index];
+        const sampleAnswer = questionData.options[shuffleIndex];
+        return (
           <div
-            className="box-exam-question-sample-answer-check-box"
-            onClick={() => {
-              onChoseAt(index);
-            }}
-            style={getAnswerTextStlyle(index)}
+            key={index}
+            className="box-exam-question-sample-answer-container"
           >
-            {!isCheckAt(index) && (
-              <AppIcon
-                className="box-exam-question-sample-answer-box"
-                iconType={AppConst.ICON_TYPE.EMPTY_BOX}
-              />
-            )}
-            {isCheckAt(index) && (
-              <AppIcon
-                className="box-exam-question-sample-answer-box"
-                iconType={AppConst.ICON_TYPE.CHECK_BOX}
-              />
-            )}
+            <div
+              className="box-exam-question-sample-answer-check-box"
+              onClick={() => {
+                onChoseAt(index);
+              }}
+              style={getAnswerTextStlyle(index)}
+            >
+              {!isCheckAt(index) && (
+                <AppIcon
+                  className="box-exam-question-sample-answer-box"
+                  iconType={AppConst.ICON_TYPE.EMPTY_BOX}
+                />
+              )}
+              {isCheckAt(index) && (
+                <AppIcon
+                  className="box-exam-question-sample-answer-box"
+                  iconType={AppConst.ICON_TYPE.CHECK_BOX}
+                />
+              )}
+            </div>
+            <label
+              className="box-exam-question-sample-anwser-content box-exam-question-label"
+              style={getAnswerTextStlyle(index)}
+            >
+              {sampleAnswer}
+            </label>
           </div>
-          <label
-            className="box-exam-question-sample-anwser-content box-exam-question-label"
-            style={getAnswerTextStlyle(index)}
-          >
-            {sampleAnswer}
-          </label>
-        </div>
-      ))}
+        );
+      })}
       {questionMode === AppConst.EXAM_DETAIL_MODE.FULL && (
         <div className="box-exam-question-explain-container">
           <label className="box-exam-question-explain-content box-exam-question-label">

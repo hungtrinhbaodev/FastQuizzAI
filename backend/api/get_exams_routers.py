@@ -23,8 +23,6 @@ def get_exams():
     for exam in exams:
         exams_data.append(exam.get_dict())
 
-    print(exams_data)
-
     return jsonify({
         "message": "get all exams success!",
         "exams_data": exams_data

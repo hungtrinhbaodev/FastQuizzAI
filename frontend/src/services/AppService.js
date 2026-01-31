@@ -172,7 +172,8 @@ class AppService {
       examingData['exam_id'],
       examingData['remaining_time'],
       examingData['anwsers'],
-      this.readDetailData(examDetailData)
+      this.readDetailData(examDetailData),
+      examingData['shuffle_answers']
     );
   }
 
@@ -185,7 +186,8 @@ class AppService {
       examHistory['start_time'],
       examHistory['exam_answers'],
       examHistory['exam_point'],
-      examHistory['correct_answers']
+      examHistory['correct_answers'],
+      examHistory['shuffle_answers']
     );
   }
 

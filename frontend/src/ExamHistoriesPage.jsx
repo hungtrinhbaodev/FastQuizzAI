@@ -46,7 +46,6 @@ const ExamHistoriesPage = ({ useLoading, useDialog, closeDialog }) => {
 
     appService.subscribe(listener);
     const historiesData = appService.getHistoriesData();
-    console.log('historiesData', historiesData);
     if (historiesData === null) {
       appService.requestHistoriesData();
     } else {
