@@ -39,14 +39,23 @@ class EXAM_STATE(Enum):
 
 DEFAUL_PATH_PROJECT = ""
 
-DEFAUL_PATH_PROJECT = os.getcwd()
+def get_app_path():
+    if getattr(sys, 'frozen', False):
+        # If the app is compiled (PyInstaller)
+        # sys.executable is the path to the .exe file
+        return os.path.dirname(os.path.realpath(sys.executable))
+    else:
+        # If the app is running as a normal script
+        return os.path.dirname(os.path.realpath(__file__))
 
 DOCUMENTS_FOLDER = os.path.join(
-    DEFAUL_PATH_PROJECT, 'assets', 'documents')
+    get_app_path(), 'assets', 'documents')
 
-EXAM_FOLDER = os.path.join(DEFAUL_PATH_PROJECT, 'assets', 'exams')
+EXAM_FOLDER = os.path.join(get_app_path(), 'assets', 'exams')
 
-CONFIG_PATH = os.path.join(DEFAUL_PATH_PROJECT, 'assets', 'config.json')
+CONFIG_PATH = os.path.join(get_app_path(), 'assets', 'config.json')
+
+print("DEFAUL_PATH_PROJECT", DOCUMENTS_FOLDER, EXAM_FOLDER, CONFIG_PATH, get_app_path())
 
 with open(CONFIG_PATH, 'r', encoding='utf-8') as file:
     # Use json.load to parse the file object

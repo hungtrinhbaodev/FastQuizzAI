@@ -13,9 +13,11 @@ print("BUILD BACKEND...")
 # 2. Construct the command
 # We use sys.executable to ensure we use the Python from your venv_arm64
 build_command = [
-    sys.executable, "-m", "PyInstaller",
+    "pyinstaller",
+    "--noconfirm",
     "--onefile",
-    "--noconsole",
+    "--collect-all", "pydantic_core",
+    "--collect-all", "pydantic",
     "--clean", # Added to force a fresh analysis
     "--distpath", PATH_RELEASE,
     "--target-arch", "universal2",
@@ -26,7 +28,7 @@ build_command = [
 result = subprocess.run(build_command)
 
 COPIES_FILES = [
-    # "./assets/config.json"
+    "./assets/config.json"
 ]
 
 print("COPYING RESOURCES...")

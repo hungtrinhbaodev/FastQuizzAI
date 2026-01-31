@@ -14,7 +14,7 @@ from api.test_api_routes import test_api_bp
 from api.do_exam_routes import do_exam_bp
 from api.get_exam_histories_routes import get_exam_histories_bp
 from api.ping_routes import ping_api_bp, manage_ping
-from const import APP_CONF, DEFAUL_PATH_PROJECT
+from const import APP_CONF, get_app_path
 
 import threading
 import http.server
@@ -48,7 +48,7 @@ app.register_blueprint(ping_api_bp, url_prefix='/api')
 
 def serve_frontend():
     # Change the directory to where your index.html is
-    os.chdir(DEFAUL_PATH_PROJECT)
+    os.chdir(get_app_path())
     
     Handler = http.server.SimpleHTTPRequestHandler
     
